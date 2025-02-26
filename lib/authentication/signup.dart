@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'login.dart'; // Import the login page
 
 class SignUpPage extends StatefulWidget {
   @override
@@ -19,8 +20,13 @@ class _SignUpPageState extends State<SignUpPage> {
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      // Handle form submission (e.g., send data to backend)
       print("Form submitted successfully");
+
+      // After successful sign-up, navigate to the Login page
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+      );
     }
   }
 
@@ -78,6 +84,31 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                       ),
                     ),
+                    SizedBox(height: 15),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => LoginPage()),
+                        );
+                      },
+                      child: Text.rich(
+                        TextSpan(
+                          text: "Already have an account? ",
+                          style: TextStyle(color: Colors.black),
+                          children: [
+                            TextSpan(
+                              text: "Login here.",
+                              style: TextStyle(
+                                color: Colors.blue,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -88,8 +119,8 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  /// Standard TextField with validation
-  Widget _buildTextField(String label, TextEditingController controller, {bool isPassword = false, bool isEmail = false, bool isNumeric = false}) {
+  Widget _buildTextField(String label, TextEditingController controller,
+      {bool isPassword = false, bool isEmail = false, bool isNumeric = false}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 15),
       child: TextFormField(
@@ -115,7 +146,6 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  /// Dropdown for selecting user role
   Widget _buildDropdownField() {
     return Padding(
       padding: const EdgeInsets.only(bottom: 15),
