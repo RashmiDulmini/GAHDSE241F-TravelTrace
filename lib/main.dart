@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:traveltrace/authentication/signup.dart';
+import 'package:traveltrace/authentication/getstarted.dart';
 
 void main() {
   runApp(MyApp());
@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: Scaffold(
-        body: SignUpPage(),
+        body: GetStartedPage(),
       ),
     );
   }
