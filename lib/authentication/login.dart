@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-
+ import 'package:flutter/material.dart';
+ import 'package:traveltrace/pages/homepage.dart';
 class LoginPage extends StatefulWidget {
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -14,7 +14,12 @@ class _LoginPageState extends State<LoginPage> {
   void _submitLogin() {
     if (_formKey.currentState!.validate()) {
       print("Login successful");
-      // Add login logic (e.g., authentication API call)
+      
+      // Navigate to the HomePage after successful login
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
+      );
     }
   }
 
