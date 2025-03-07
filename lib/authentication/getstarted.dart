@@ -1,6 +1,6 @@
- import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:traveltrace/authentication/signup.dart';
+import 'package:traveltrace/authentication/start_page.dart';
 
 void main() {
   runApp(MyApp());
@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
       title: 'Travel Trace',
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        fontFamily: 'Poppins', // Add a modern font
+        fontFamily: 'Poppins', // Modern font
       ),
       home: GetStartedPage(),
     );
@@ -25,62 +25,81 @@ class GetStartedPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.blue.shade900, Colors.blue.shade400],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "Travel Trace",
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-                letterSpacing: 1.5,
+      backgroundColor: Colors.white, // White background
+      body: Column(
+        children: [
+          // Top Curved Container
+          Container(
+            width: double.infinity,
+            height: 180,
+            decoration: BoxDecoration(
+              color: Colors.blue, // Header background color
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(50),
+                bottomRight: Radius.circular(50),
               ),
             ),
-            SizedBox(height: 20),
-            Lottie.asset(
-              'assets/animations/perTravel.json', // Ensure correct path
-              width: 300,
-              height: 300,
-              fit: BoxFit.cover,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Travel Trace",
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 5),
+                Text(
+                  "Discover, create, and explore trails",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.white70,
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: 30),
-            ElevatedButton(
+          ),
+          SizedBox(height: 20),
+          // Lottie Animation
+          Lottie.asset(
+            'assets/animations/perTravel.json', // Ensure correct path
+            width: 300,
+            height: 300,
+            fit: BoxFit.cover,
+          ),
+          SizedBox(height: 20),
+          
+          // Get Started Button
+          SizedBox(
+            width: 200,
+            child: ElevatedButton(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SignUpPage()),
+                  MaterialPageRoute(builder: (context) => StartPage()),
                 );
               },
               style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 18),
+                backgroundColor: Colors.blue, // Match button color
+                padding: EdgeInsets.symmetric(vertical: 15),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                backgroundColor: Colors.white,
-                elevation: 5,
               ),
               child: Text(
-                'Get Started',
+                "Get Started",
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 16,
+                  color: Colors.white,
                   fontWeight: FontWeight.bold,
-                  color: Colors.blue.shade900,
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

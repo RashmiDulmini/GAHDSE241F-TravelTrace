@@ -1,4 +1,5 @@
- import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'trail_create.dart';
 
 class HomePage extends StatelessWidget {
   @override
@@ -100,6 +101,29 @@ class HomePage extends StatelessWidget {
                 style: TextStyle(fontSize: 16),
               ),
             ),
+            
+            // Popular Trails Section with Button
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  Text(
+                    'Popular Trails',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => TrailCreatePage()),
+                      );
+                    },
+                    child: Text('Create a Trail'),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -110,7 +134,7 @@ class HomePage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             IconButton(icon: Icon(Icons.facebook), onPressed: () {}),
-            ],
+          ],
         ),
       ),
     );
