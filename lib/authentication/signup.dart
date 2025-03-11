@@ -1,7 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:traveltrace/authentication/start_page.dart';
+import 'package:traveltrace/pages/homepage.dart';
 
-class SignUpPage extends StatelessWidget {
+class SignUpPage extends StatefulWidget {
+  @override
+  _SignUpPageState createState() => _SignUpPageState();
+}
+
+class _SignUpPageState extends State<SignUpPage> {
+  final TextEditingController fullNameController = TextEditingController();
+  final TextEditingController userNameController = TextEditingController();
+  final TextEditingController addressController = TextEditingController();
+  final TextEditingController contactController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  String? selectedRole;
+
+  void _signUp() {
+    if (selectedRole == null ||
+        fullNameController.text.isEmpty ||
+        userNameController.text.isEmpty ||
+        addressController.text.isEmpty ||
+        contactController.text.isEmpty ||
+        emailController.text.isEmpty ||
+        passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Please fill all fields")),
+      );
+      return;
+    }
+
+    // Navigate to HomePage on successful signup
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => HomePage()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,22 +86,20 @@ class SignUpPage extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: 30),
               child: Column(
                 children: [
-                  buildInputField("Select your role"),
-                  buildInputField("Full Name"),
-                  buildInputField("User Name"),
-                  buildInputField("Address"),
-                  buildInputField("Contact Number"),
-                  buildInputField("Email"),
-                  buildInputField("Password", isPassword: true),
+                  buildRoleDropdown(),
+                  buildInputField("Full Name", fullNameController),
+                  buildInputField("User Name", userNameController),
+                  buildInputField("Address", addressController),
+                  buildInputField("Contact Number", contactController),
+                  buildInputField("Email", emailController),
+                  buildInputField("Password", passwordController, isPassword: true),
                   SizedBox(height: 20),
 
                   // Sign Up Button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {
-                        // Handle sign-up logic here
-                      },
+                      onPressed: _signUp,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
                         padding: EdgeInsets.symmetric(vertical: 15),
@@ -83,7 +117,7 @@ class SignUpPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(height: 30),
+                  SizedBox(height: 20),
                 ],
               ),
             ),
@@ -93,11 +127,40 @@ class SignUpPage extends StatelessWidget {
     );
   }
 
+  // Dropdown for Role Selection
+  Widget buildRoleDropdown() {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 15),
+      child: DropdownButtonFormField<String>(
+        value: selectedRole,
+        hint: Text("Select your role"),
+        items: ["User", "Admin"].map((role) {
+          return DropdownMenuItem(
+            value: role,
+            child: Text(role),
+          );
+        }).toList(),
+        onChanged: (value) {
+          setState(() {
+            selectedRole = value;
+          });
+        },
+        decoration: InputDecoration(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+          contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        ),
+      ),
+    );
+  }
+
   // Custom Input Field Widget
-  Widget buildInputField(String hint, {bool isPassword = false}) {
+  Widget buildInputField(String hint, TextEditingController controller, {bool isPassword = false}) {
     return Padding(
       padding: EdgeInsets.only(bottom: 15),
       child: TextField(
+        controller: controller,
         obscureText: isPassword,
         decoration: InputDecoration(
           hintText: hint,

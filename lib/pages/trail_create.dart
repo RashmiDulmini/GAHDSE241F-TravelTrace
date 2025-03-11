@@ -1,7 +1,7 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'trail_details_page.dart';
 
 class TrailCreatePage extends StatefulWidget {
   @override
@@ -16,7 +16,6 @@ class _TrailCreatePageState extends State<TrailCreatePage> {
   File? _mediaFile;
   final ImagePicker _picker = ImagePicker();
 
-  // Function to pick media from camera or gallery
   Future<void> _pickMedia(ImageSource source) async {
     try {
       final XFile? pickedFile = await _picker.pickImage(source: source);
@@ -26,7 +25,6 @@ class _TrailCreatePageState extends State<TrailCreatePage> {
         });
       }
     } catch (e) {
-      print("Error picking image: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Failed to pick an image")),
       );
@@ -44,25 +42,29 @@ class _TrailCreatePageState extends State<TrailCreatePage> {
       return;
     }
 
-    print("Trail Created!");
-    print("Name: ${nameController.text}");
-    print("Trail Name: ${trailNameController.text}");
-    print("Description: ${descriptionController.text}");
-    print("Media: ${_mediaFile!.path}");
-
-    // Perform actual trail creation logic here
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TrailDetailsPage(
+          name: nameController.text,
+          trailName: trailNameController.text,
+          description: descriptionController.text,
+          mediaFile: _mediaFile!,
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF1AB7EA), // Background color
+      backgroundColor: const Color(0xFF1AB7EA),
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(20.0),
             child: Container(
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(15),
@@ -71,58 +73,40 @@ class _TrailCreatePageState extends State<TrailCreatePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Back Arrow and Title
                   Row(
                     children: [
                       IconButton(
-                        icon: Icon(Icons.arrow_back, color: Colors.black),
+                        icon: const Icon(Icons.arrow_back, color: Colors.black),
                         onPressed: () => Navigator.pop(context),
                       ),
-                      Text(
+                      const Text(
                         "Trail Create",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
                       ),
                     ],
                   ),
-                  SizedBox(height: 20),
-
-                  // Input Fields
+                  const SizedBox(height: 20),
                   _buildLabel("Who Are You?"),
                   _buildTextField("Enter Your Name", nameController),
-
                   _buildLabel("What is Your Trail?"),
                   _buildTextField("Enter Your Trail Name", trailNameController),
-
                   _buildLabel("Enter the Description"),
                   _buildTextField("Enter The Description", descriptionController),
-
-                  SizedBox(height: 20),
-
-                  // Upload Section
+                  const SizedBox(height: 20),
                   _buildUploadSection(),
-
-                  SizedBox(height: 20),
-
-                  // Create Trail Button
+                  const SizedBox(height: 20),
                   Center(
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFF162221), // Button color
+                        backgroundColor: const Color(0xFF162221),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
                         ),
                       ),
                       onPressed: _createTrail,
-                      child: Padding(
+                      child: const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
-                        child: Text(
-                          'Create Trail',
-                          style: TextStyle(color: Colors.white, fontSize: 16),
-                        ),
+                        child: Text('Create Trail', style: TextStyle(color: Colors.white, fontSize: 16)),
                       ),
                     ),
                   ),
@@ -135,18 +119,13 @@ class _TrailCreatePageState extends State<TrailCreatePage> {
     );
   }
 
-  // Function to build section labels
   Widget _buildLabel(String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 5),
-      child: Text(
-        text,
-        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
-      ),
+      child: Text(text, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
     );
   }
 
-  // Function to build text fields
   Widget _buildTextField(String hint, TextEditingController controller) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 15),
@@ -155,14 +134,13 @@ class _TrailCreatePageState extends State<TrailCreatePage> {
         decoration: InputDecoration(
           hintText: hint,
           filled: true,
-          fillColor: Colors.grey[400],
+          fillColor: Colors.grey[300],
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
         ),
       ),
     );
   }
 
-  // Upload Section with Camera & Gallery Options
   Widget _buildUploadSection() {
     return Column(
       children: [
@@ -173,10 +151,10 @@ class _TrailCreatePageState extends State<TrailCreatePage> {
               border: Border.all(color: Colors.black45),
               borderRadius: BorderRadius.circular(10),
             ),
-            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
+              children: const [
                 Icon(Icons.add_circle_outline, size: 28, color: Colors.black),
                 SizedBox(width: 8),
                 Text("Upload", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
@@ -184,14 +162,9 @@ class _TrailCreatePageState extends State<TrailCreatePage> {
             ),
           ),
         ),
-        SizedBox(height: 8),
-        Text(
-          "Please pick an image/video",
-          style: TextStyle(fontSize: 14, color: Colors.black54),
-        ),
-        SizedBox(height: 10),
-
-        // Show Selected Image
+        const SizedBox(height: 8),
+        const Text("Please pick an image/video", style: TextStyle(fontSize: 14, color: Colors.black54)),
+        const SizedBox(height: 10),
         if (_mediaFile != null)
           Container(
             width: 100,
@@ -206,7 +179,6 @@ class _TrailCreatePageState extends State<TrailCreatePage> {
     );
   }
 
-  // Show Dialog for choosing Camera or Gallery
   void _showMediaPickerDialog() {
     showModalBottomSheet(
       context: context,
@@ -214,16 +186,16 @@ class _TrailCreatePageState extends State<TrailCreatePage> {
         return Wrap(
           children: [
             ListTile(
-              leading: Icon(Icons.camera_alt),
-              title: Text("Take a Photo"),
+              leading: const Icon(Icons.camera_alt),
+              title: const Text("Take a Photo"),
               onTap: () {
                 Navigator.pop(context);
                 _pickMedia(ImageSource.camera);
               },
             ),
             ListTile(
-              leading: Icon(Icons.photo_library),
-              title: Text("Choose from Gallery"),
+              leading: const Icon(Icons.photo_library),
+              title: const Text("Choose from Gallery"),
               onTap: () {
                 Navigator.pop(context);
                 _pickMedia(ImageSource.gallery);
