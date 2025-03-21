@@ -164,7 +164,7 @@ class SignInPage extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 30),
-              */
+             */ 
             ],
           ),
         ),

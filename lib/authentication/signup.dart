@@ -31,7 +31,6 @@ class _SignUpPageState extends State<SignUpPage> {
       return;
     }
 
-    // Navigate to HomePage on successful signup
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => HomePage()),
@@ -45,7 +44,6 @@ class _SignUpPageState extends State<SignUpPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Top Section with Background and Back Button
             Container(
               width: double.infinity,
               padding: EdgeInsets.symmetric(vertical: 40, horizontal: 20),
@@ -57,7 +55,6 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
               child: Row(
                 children: [
-                  // Back Button
                   IconButton(
                     icon: Icon(Icons.arrow_back, color: Colors.white),
                     onPressed: () {
@@ -80,22 +77,18 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
             ),
             SizedBox(height: 20),
-
-            // Form Fields
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 30),
               child: Column(
                 children: [
                   buildRoleDropdown(),
-                  buildInputField("Full Name", fullNameController),
-                  buildInputField("User Name", userNameController),
-                  buildInputField("Address", addressController),
-                  buildInputField("Contact Number", contactController),
-                  buildInputField("Email", emailController),
-                  buildInputField("Password", passwordController, isPassword: true),
+                  buildCustomInputField("Who are you?", fullNameController),
+                  buildCustomInputField("What is your username?", userNameController),
+                  buildCustomInputField("Enter address", addressController),
+                  buildCustomInputField("Enter contact number", contactController),
+                  buildCustomInputField("Enter email", emailController),
+                  buildCustomInputField("Enter password", passwordController, isPassword: true),
                   SizedBox(height: 20),
-
-                  // Sign Up Button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -104,7 +97,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         backgroundColor: Colors.blue,
                         padding: EdgeInsets.symmetric(vertical: 15),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(30),
                         ),
                       ),
                       child: Text(
@@ -127,7 +120,6 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  // Dropdown for Role Selection
   Widget buildRoleDropdown() {
     return Padding(
       padding: EdgeInsets.only(bottom: 15),
@@ -155,8 +147,7 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  // Custom Input Field Widget
-  Widget buildInputField(String hint, TextEditingController controller, {bool isPassword = false}) {
+  Widget buildCustomInputField(String hint, TextEditingController controller, {bool isPassword = false}) {
     return Padding(
       padding: EdgeInsets.only(bottom: 15),
       child: TextField(

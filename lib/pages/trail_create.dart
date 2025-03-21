@@ -1,7 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'map_page.dart';
 import 'trail_details_page.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class TrailCreatePage extends StatefulWidget {
   @override
@@ -15,6 +17,8 @@ class _TrailCreatePageState extends State<TrailCreatePage> {
 
   File? _mediaFile;
   final ImagePicker _picker = ImagePicker();
+  LatLng? _startLocation;
+  LatLng? _endLocation;
 
   Future<void> _pickMedia(ImageSource source) async {
     try {
@@ -31,13 +35,29 @@ class _TrailCreatePageState extends State<TrailCreatePage> {
     }
   }
 
+  Future<void> _openMap() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => MapPage()),
+    );
+
+    if (result != null) {
+      setState(() {
+        _startLocation = result['start'];
+        _endLocation = result['end'];
+      });
+    }
+  }
+
   void _createTrail() {
     if (nameController.text.isEmpty ||
         trailNameController.text.isEmpty ||
         descriptionController.text.isEmpty ||
-        _mediaFile == null) {
+        _mediaFile == null ||
+        _startLocation == null ||
+        _endLocation == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Please fill all fields and upload an image/video")),
+        SnackBar(content: Text("Please complete all fields")),
       );
       return;
     }
@@ -50,6 +70,8 @@ class _TrailCreatePageState extends State<TrailCreatePage> {
           trailName: trailNameController.text,
           description: descriptionController.text,
           mediaFile: _mediaFile!,
+          //startLocation: _startLocation!,
+          //endLocation: _endLocation!,
         ),
       ),
     );
@@ -58,152 +80,84 @@ class _TrailCreatePageState extends State<TrailCreatePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1AB7EA),
-      body: Center(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(15),
-              ),
-              width: 350,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.arrow_back, color: Colors.black),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                      const Text(
-                        "Trail Create",
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  _buildLabel("Who Are You?"),
-                  _buildTextField("Enter Your Name", nameController),
-                  _buildLabel("What is Your Trail?"),
-                  _buildTextField("Enter Your Trail Name", trailNameController),
-                  _buildLabel("Enter the Description"),
-                  _buildTextField("Enter The Description", descriptionController),
-                  const SizedBox(height: 20),
-                  _buildUploadSection(),
-                  const SizedBox(height: 20),
-                  Center(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF162221),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                      onPressed: _createTrail,
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
-                        child: Text('Create Trail', style: TextStyle(color: Colors.white, fontSize: 16)),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+      appBar: AppBar(
+        title: Text("Trail create", style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.blue,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
         ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            _buildTextField(nameController, "Who are you?"),
+            _buildTextField(trailNameController, "What is your trail?"),
+            _buildTextField(descriptionController, "Enter description"),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _openMap,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.grey[400],
+                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+              ),
+              child: Text("Go to Map...", style: TextStyle(fontSize: 16)),
+            ),
+            const SizedBox(height: 5),
+            Text("Select and mark start, end locations, specific locations here.",
+                style: TextStyle(fontSize: 12, color: Colors.black54)),
+            if (_startLocation != null && _endLocation != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Text("Start: $_startLocation, End: $_endLocation",
+                    style: TextStyle(color: Colors.blue)),
+              ),
+            const SizedBox(height: 20),
+            GestureDetector(
+              onTap: () => _pickMedia(ImageSource.gallery),
+              child: Icon(Icons.add_circle_outline, size: 40, color: Colors.blue),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _createTrail,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                padding: EdgeInsets.symmetric(horizontal: 60, vertical: 15),
+              ),
+              child: Text("Create Trail", style: TextStyle(fontSize: 16, color: Colors.white)),
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.grey[300],
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.black54,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: ""),
+          BottomNavigationBarItem(icon: Icon(Icons.directions_walk), label: ""),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: ""),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: ""),
+        ],
       ),
     );
   }
 
-  Widget _buildLabel(String text) {
+  Widget _buildTextField(TextEditingController controller, String label) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 5),
-      child: Text(text, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
-    );
-  }
-
-  Widget _buildTextField(String hint, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 15),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: TextField(
         controller: controller,
         decoration: InputDecoration(
-          hintText: hint,
-          filled: true,
-          fillColor: Colors.grey[300],
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+          labelText: label,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(25),
+          ),
+          contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         ),
       ),
-    );
-  }
-
-  Widget _buildUploadSection() {
-    return Column(
-      children: [
-        GestureDetector(
-          onTap: () => _showMediaPickerDialog(),
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.black45),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                Icon(Icons.add_circle_outline, size: 28, color: Colors.black),
-                SizedBox(width: 8),
-                Text("Upload", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        const Text("Please pick an image/video", style: TextStyle(fontSize: 14, color: Colors.black54)),
-        const SizedBox(height: 10),
-        if (_mediaFile != null)
-          Container(
-            width: 100,
-            height: 100,
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.black45),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Image.file(_mediaFile!, fit: BoxFit.cover),
-          ),
-      ],
-    );
-  }
-
-  void _showMediaPickerDialog() {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return Wrap(
-          children: [
-            ListTile(
-              leading: const Icon(Icons.camera_alt),
-              title: const Text("Take a Photo"),
-              onTap: () {
-                Navigator.pop(context);
-                _pickMedia(ImageSource.camera);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.photo_library),
-              title: const Text("Choose from Gallery"),
-              onTap: () {
-                Navigator.pop(context);
-                _pickMedia(ImageSource.gallery);
-              },
-            ),
-          ],
-        );
-      },
     );
   }
 }
