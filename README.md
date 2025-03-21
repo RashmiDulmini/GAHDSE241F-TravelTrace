@@ -1,6 +1,6 @@
 # traveltrace
 
-A new Flutter project.
+TravelTrace is a mobile travel management application designed for users to create, explore, and manage travel trails. The platform enables users to create past, present, and future journeys by adding multimedia content such as photos, videos, and articles.
 
 ## Getting Started
 
