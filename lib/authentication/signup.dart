@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:traveltrace/authentication/start_page.dart';
-import 'package:traveltrace/pages/homepage.dart';
+import 'package:traveltrace/pages/home_page.dart';
 
 class SignUpPage extends StatefulWidget {
   @override

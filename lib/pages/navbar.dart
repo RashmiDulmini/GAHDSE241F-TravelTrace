@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:traveltrace/pages/acc_page.dart';
-import 'package:traveltrace/pages/homepage.dart';
+import 'package:traveltrace/pages/home_page.dart';
 import 'package:traveltrace/pages/trail_create.dart';
-import 'package:traveltrace/pages/trailsearch.dart';
+import 'package:traveltrace/pages/trail_search.dart';
  
 void main() {
   runApp(TravelTraceApp());
