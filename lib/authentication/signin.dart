@@ -1,12 +1,13 @@
-import 'package:flutter/material.dart';
+ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-//import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SignInPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+
       body: Center(
         child: SingleChildScrollView(
           child: Column(
@@ -33,28 +34,15 @@ class SignInPage extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 10),
-                    // Profile Image
-                    /*CircleAvatar(
-                      radius: 35,
-                      backgroundColor: Colors.white,
-                      child: ClipOval(
-                        child: Image.asset(
-                          'assets/animations/perTravel.json' // Replace with actual image
-                          width: 65,
-                          height: 65,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),*/
 
-                     // Lottie Animation
-            Lottie.asset(
-              'assets/animations/perTravel.json', // Ensure correct path
-              width: 300,
-              height: 300,
-              fit: BoxFit.cover,
-            ),
-            SizedBox(height: 20),
+                    // Lottie Animation
+                    Lottie.asset(
+                      'assets/animations/perTravel.json',
+                      width: 300,
+                      height: 300,
+                      fit: BoxFit.cover,
+                    ),
+                    SizedBox(height: 20),
                   ],
                 ),
               ),
@@ -83,7 +71,7 @@ class SignInPage extends StatelessWidget {
                 child: TextField(
                   decoration: InputDecoration(
                     prefixIcon: Icon(Icons.email, color: Colors.black),
-                    hintText: "email",
+                    hintText: "Email",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
@@ -99,7 +87,7 @@ class SignInPage extends StatelessWidget {
                   obscureText: true,
                   decoration: InputDecoration(
                     prefixIcon: Icon(Icons.lock, color: Colors.black),
-                    hintText: "password",
+                    hintText: "Password",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
@@ -134,37 +122,66 @@ class SignInPage extends StatelessWidget {
               ),
               SizedBox(height: 15),
 
-              // OR Login with
+              // OR login with
               Text(
                 "OR login with",
                 style: TextStyle(fontSize: 14, color: Colors.black87),
               ),
               SizedBox(height: 10),
 
-/*
-              // Social Login Buttons
+              // Social Login Buttons (Round Buttons)
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Facebook
-                  IconButton(
-                    icon: FaIcon(FontAwesomeIcons.facebook, color: Colors.blue, size: 30),
-                    onPressed: () {
+                  // Facebook Button
+                  GestureDetector(
+                    onTap: () {
                       // Facebook login action
                     },
+                    child: Container(
+                      padding: EdgeInsets.all(15),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color(0xFF4267B2), // Facebook Blue
+                      ),
+                      child: FaIcon(
+                        FontAwesomeIcons.facebookF,
+                        color: Colors.white,
+                        size: 30,
+                      ),
+                    ),
                   ),
-                  SizedBox(width: 20),
-                  // Google
-                  IconButton(
-                    icon: FaIcon(FontAwesomeIcons.google, color: Colors.red, size: 30),
-                    onPressed: () {
+                  SizedBox(width: 30),
+
+                  // Google Button
+                  GestureDetector(
+                    onTap: () {
                       // Google login action
                     },
+                    child: Container(
+                      padding: EdgeInsets.all(15),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                        border: Border.all(color: Colors.grey.shade300),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.shade400,
+                            blurRadius: 4,
+                            offset: Offset(2, 2),
+                          )
+                        ],
+                      ),
+                      child: FaIcon(
+                        FontAwesomeIcons.google,
+                        color: Colors.red,
+                        size: 30,
+                      ),
+                    ),
                   ),
                 ],
               ),
               SizedBox(height: 30),
-             */ 
             ],
           ),
         ),
