@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+//import 'package:traveltrace/pages/acc_page.dart';
+//import 'package:traveltrace/pages/trailsearch.dart';
 import 'package:traveltrace/authentication/getstarted.dart';
 
 void main() {
@@ -10,12 +12,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Signup App',
+      title: 'get',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
       home: Scaffold(
-        body: GetStartedPage(),
+        body:MyApp(),
       ),
     );
   }
