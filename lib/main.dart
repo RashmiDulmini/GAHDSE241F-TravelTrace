@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:traveltrace/authentication/getstarted.dart';
+//import 'package:traveltrace/pages/acc_page.dart';
 //import 'package:traveltrace/pages/acc_page.dart';
 //import 'package:traveltrace/pages/trailsearch.dart';
-//import 'package:traveltrace/authentication/getstarted.dart';
-import 'package:traveltrace/pages/home_page.dart';
+//import 'package:traveltrace/pages/home_page.dart';
 
 void main() {
   runApp(MyApp());
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: Scaffold(
-        body: HomePage(),
+        body: GetStartedPage(),
       ),
     );
   }

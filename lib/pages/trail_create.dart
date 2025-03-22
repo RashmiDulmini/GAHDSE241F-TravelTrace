@@ -1,9 +1,13 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:traveltrace/pages/acc_page.dart';
+import 'package:traveltrace/pages/home_page.dart';
+import 'package:traveltrace/pages/navbar.dart';
+import 'package:traveltrace/pages/trail_search.dart';
 import 'map_page.dart';
 import 'trail_details_page.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class TrailCreatePage extends StatefulWidget {
   @override
@@ -70,8 +74,6 @@ class _TrailCreatePageState extends State<TrailCreatePage> {
           trailName: trailNameController.text,
           description: descriptionController.text,
           mediaFile: _mediaFile!,
-          //startLocation: _startLocation!,
-          //endLocation: _endLocation!,
         ),
       ),
     );
@@ -81,7 +83,7 @@ class _TrailCreatePageState extends State<TrailCreatePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Trail create", style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text("Trail Create", style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.blue,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
@@ -131,16 +133,29 @@ class _TrailCreatePageState extends State<TrailCreatePage> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.grey[300],
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.black54,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: ""),
-          BottomNavigationBarItem(icon: Icon(Icons.directions_walk), label: ""),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: ""),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: ""),
-        ],
+      bottomNavigationBar: Navbar(
+        selectedIndex: 1, // Setting this as the second page in navigation
+        onItemTapped: (index) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                switch (index) {
+                  case 0:
+                    return HomePage();
+                  case 1:
+                    return TrailCreatePage();
+                  case 2:
+                    return TrailSearchApp();
+                  case 3:
+                    return AccountApp();
+                  default:
+                    return HomePage();
+                }
+              },
+            ),
+          );
+        },
       ),
     );
   }

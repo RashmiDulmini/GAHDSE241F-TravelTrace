@@ -1,5 +1,8 @@
- import 'package:flutter/material.dart';
-import 'trail_create.dart';
+import 'package:flutter/material.dart';
+import 'package:traveltrace/pages/main_screen.dart';
+import 'package:traveltrace/pages/navbar.dart';
+import 'package:traveltrace/pages/trail_create.dart';
+import 'package:traveltrace/pages/navbar.dart';
 
 class HomePage extends StatelessWidget {
   @override
@@ -133,6 +136,17 @@ class HomePage extends StatelessWidget {
             SizedBox(height: 20),
           ],
         ),
+      ),
+      
+      // Add the Navbar
+      bottomNavigationBar: Navbar(
+        selectedIndex: 0, // Home Page
+        onItemTapped: (index) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => MainScreen()),
+          );
+        },
       ),
     );
   }

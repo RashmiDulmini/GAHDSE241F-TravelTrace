@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:traveltrace/pages/acc_page.dart';
+import 'package:traveltrace/pages/home_page.dart';
+import 'package:traveltrace/pages/navbar.dart';
+import 'package:traveltrace/pages/trail_create.dart';
+import 'package:traveltrace/pages/navbar.dart';
 
 void main() {
   runApp(TrailSearchApp());
@@ -143,16 +148,28 @@ class _TrailSearchScreenState extends State<TrailSearchScreen> {
       ),
 
       // Bottom Navigation Bar
-      bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: Colors.cyan[700],
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
-        ],
-        onTap: (index) {
-          // Handle navigation logic here
+      bottomNavigationBar: Navbar(
+        selectedIndex: 2, // Setting this as the third page in navigation (Search)
+        onItemTapped: (index) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                switch (index) {
+                  case 0:
+                    return HomePage();
+                  case 1:
+                    return TrailCreatePage();
+                  case 2:
+                    return TrailSearchScreen();
+                  case 3:
+                    return AccountApp();
+                  default:
+                    return HomePage();
+                }
+              },
+            ),
+          );
         },
       ),
     );
