@@ -3,7 +3,7 @@ import 'package:traveltrace/pages/home_page.dart';
 import 'package:traveltrace/pages/navbar.dart';
 import 'package:traveltrace/pages/trail_create.dart';
 import 'package:traveltrace/pages/trail_search.dart';
-import 'package:traveltrace/pages/navbar.dart';
+import 'package:traveltrace/pages/edit_profile.dart'; // Import Edit Profile page
 
 void main() {
   runApp(AccountApp());
@@ -65,7 +65,10 @@ class AccountScreen extends StatelessWidget {
               leading: Icon(Icons.edit),
               title: Text('Edit Profile'),
               onTap: () {
-                // Handle edit profile tap
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProfileUpdateApp()),
+                );
               },
             ),
             Divider(),
