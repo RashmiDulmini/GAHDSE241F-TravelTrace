@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:traveltrace/pages/view_created_trail.dart'; // Import the target page
 
 void main() {
   runApp(TrailSuccessScreen());
@@ -8,6 +9,7 @@ class TrailSuccessScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
@@ -15,7 +17,9 @@ class TrailSuccessScreen extends StatelessWidget {
           elevation: 0,
           leading: IconButton(
             icon: Icon(Icons.arrow_back, color: Colors.black),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pop(context); // Navigates back to the previous page
+            },
           ),
         ),
         body: Center(
@@ -25,7 +29,7 @@ class TrailSuccessScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Trail created successfully!! 😆',
+                  'Trail created successfully!!!',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
@@ -34,8 +38,16 @@ class TrailSuccessScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 10),
+                
+                // View Your Trail Button
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    // Navigate to ViewCreatedTrailScreen
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => ViewCreatedTrailScreen()),
+                    );
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFFDADADA),
                     shape: RoundedRectangleBorder(
@@ -51,9 +63,12 @@ class TrailSuccessScreen extends StatelessWidget {
                     ),
                   ),
                 ),
+
                 SizedBox(height: 20),
+
+                // Trail Image
                 Image.asset(
-                  'C:\Users\Rashmi Mendis\Documents\GAHDSE241F-TravelTrace\images\travel2.jpg.webpC:\Users\Rashmi Mendis\Documents\GAHDSE241F-TravelTrace\images\travel2.jpg.webp', // Replace with the correct asset path
+                  'assets/travel.png', // Ensure correct path
                   height: 250,
                 ),
               ],
