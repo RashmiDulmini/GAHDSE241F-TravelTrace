@@ -1,6 +1,16 @@
 # traveltrace
 
-TravelTrace is a mobile travel management application designed for users to create, explore, and manage travel trails. The platform enables users to create past, present, and future journeys by adding multimedia content such as photos, videos, and articles.
+TravelTrace is a mobile and web-based travel management application designed for users to create, explore, and manage travel trails. The platform enables users to create past, present, and future journeys by adding multimedia content such as photos, videos, and articles.
+Administrators can manage users, locations (cities, districts, provinces), and trails, ensuring a well-organized travel experience. The system incorporates a map feature for marking start and end locations, allowing travelers to plan and track their journeys efficiently.
+The user-friendly interface and navigation system enhance the overall experience, making TravelTrace a reliable tool for travelers.
+
+💻 Tech Stack
+Frontend (Mobile) - Flutter
+Backend (Mobile) - Spring boot
+Frontend (Web) - React, Thymeleaf
+Backend (Web) - Spring boot
+Database - MySQL
+
 
 ## Getting Started
 
