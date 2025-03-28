@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import bookImage from "../components/book.avif"; // Replace with actual image path
+import "./Dashboard.css"; // Assuming you have a CSS file for styles
 
 export default function Dashboard() {
   useEffect(() => {
