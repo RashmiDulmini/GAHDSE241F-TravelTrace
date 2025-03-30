@@ -122,7 +122,7 @@ class _TrailSearchScreenState extends State<TrailSearchScreen> {
             SizedBox(height: 10),
 
             // GridView for latest search (wrapped in fixed height container)
-            Container(
+            SizedBox(
               height: 200,
               child: GridView.builder(
                 physics: NeverScrollableScrollPhysics(),

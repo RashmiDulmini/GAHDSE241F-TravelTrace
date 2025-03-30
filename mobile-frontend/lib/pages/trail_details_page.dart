@@ -7,7 +7,7 @@ class TrailDetailsPage extends StatefulWidget {
   final String description;
   final File mediaFile;
 
-  TrailDetailsPage({
+  const TrailDetailsPage({
     required this.name,
     required this.trailName,
     required this.description,
@@ -61,7 +61,7 @@ class _TrailDetailsPageState extends State<TrailDetailsPage> {
                         ),
                       ),
                       SizedBox(height: 5),
-                      Container(
+                      SizedBox(
                         width: MediaQuery.of(context).size.width * 0.9,
                         child: Text(
                           widget.description,

@@ -4,7 +4,6 @@ import 'package:traveltrace/pages/navbar.dart';
 import 'package:traveltrace/pages/trail_create.dart';
 import 'package:traveltrace/pages/trail_search.dart';
 import 'package:traveltrace/pages/acc_page.dart';
-import 'package:traveltrace/pages/navbar.dart';
 
 class MainScreen extends StatefulWidget {
   @override

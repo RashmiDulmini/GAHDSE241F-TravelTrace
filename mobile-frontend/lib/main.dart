@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:traveltrace/authentication/getstarted.dart';
 //import 'package:traveltrace/authentication/getstarted.dart';
 //import 'package:traveltrace/pages/home_page.dart';
-import 'package:traveltrace/pages/trail_success.dart';
 //import 'package:traveltrace/pages/acc_page.dart';
 //import 'package:traveltrace/pages/acc_page.dart';
 //import 'package:traveltrace/pages/trailsearch.dart';

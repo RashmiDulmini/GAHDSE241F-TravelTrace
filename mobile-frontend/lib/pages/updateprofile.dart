@@ -67,15 +67,15 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                   value: selectedRole,
                   items: [
                     DropdownMenuItem(
-                      child: Text('Select your role'),
                       value: 'Select your role',
+                      child: Text('Select your role'),
                     ),
                     ...roles.map((role) {
                       return DropdownMenuItem(
-                        child: Text(role),
                         value: role,
+                        child: Text(role),
                       );
-                    }).toList(),
+                    }),
                   ],
                   onChanged: (value) {
                     setState(() {
