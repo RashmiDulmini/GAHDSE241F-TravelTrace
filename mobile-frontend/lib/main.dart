@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:traveltrace/authentication/getstarted.dart';
 //import 'package:traveltrace/authentication/getstarted.dart';
 //import 'package:traveltrace/pages/home_page.dart';
 import 'package:traveltrace/pages/trail_success.dart';
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: Scaffold(
-        body: TrailSuccessScreen(),
+        body: GetStartedPage(),
       ),
     );
   }
