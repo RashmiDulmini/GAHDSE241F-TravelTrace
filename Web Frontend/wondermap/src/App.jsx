@@ -1,22 +1,22 @@
-import { useState } from 'react'
-import React from 'react'
-import Signup from './components/Signup.jsx'
+import { useState } from 'react';
+import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom'; // Corrected import of Routes and BrowserRouter
+ import './App.css';
+  import Signup from './components/Signup'; // Adjust the path as necessary
+  import GetStarted from './getstarted'; // Adjust the path as necessary
+export default function App() {
  
-import './App.css'
-
-function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-        
-        <div>
-      <Signup/>  {/* Render Home component */}
-      <p>Count: {count}</p>
+    <div>
+    <BrowserRouter>
+         <Routes>
+          <Route index element={<GetStarted/>} />
+          <Route path='/Signup' element={<Signup />} />
+        </Routes>
+      
+    </BrowserRouter>
     </div>
-    </>
-  )
+  );
 }
 
-export default App
-
+ 
