@@ -1,9 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import Lottie from "lottie-react";
-import animationData from "./animations/perTravel.json"; // Replace with your Lottie JSON file path
-
-const GetStarted = () => {
+import animationData from "./assets/animations/perTravel.json";
+ const GetStarted = () => {
   const navigate = useNavigate();
 
   return (
@@ -15,7 +14,7 @@ const GetStarted = () => {
       <p className="text-gray-600 mt-2">Start your journey with us today!</p>
       <button
         className="mt-6 px-6 py-3 text-lg bg-blue-500 hover:bg-blue-600 text-white rounded-xl shadow-lg transition"
-        onClick={() => navigate("/signup")}
+        onClick={() => navigate("/signin")}
       >
         Get Started
       </button>
