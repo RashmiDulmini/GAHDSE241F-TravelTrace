@@ -15,11 +15,8 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  String? selectedRole;
-
   void _signUp() {
-    if (selectedRole == null ||
-        fullNameController.text.isEmpty ||
+    if (fullNameController.text.isEmpty ||
         userNameController.text.isEmpty ||
         addressController.text.isEmpty ||
         contactController.text.isEmpty ||
@@ -81,13 +78,15 @@ class _SignUpPageState extends State<SignUpPage> {
               padding: EdgeInsets.symmetric(horizontal: 30),
               child: Column(
                 children: [
-                  buildRoleDropdown(),
                   buildCustomInputField("Who are you?", fullNameController),
-                  buildCustomInputField("What is your username?", userNameController),
+                  buildCustomInputField(
+                      "What is your username?", userNameController),
                   buildCustomInputField("Enter address", addressController),
-                  buildCustomInputField("Enter contact number", contactController),
+                  buildCustomInputField(
+                      "Enter contact number", contactController),
                   buildCustomInputField("Enter email", emailController),
-                  buildCustomInputField("Enter password", passwordController, isPassword: true),
+                  buildCustomInputField("Enter password", passwordController,
+                      isPassword: true),
                   SizedBox(height: 20),
                   SizedBox(
                     width: double.infinity,
@@ -120,34 +119,8 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  Widget buildRoleDropdown() {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 15),
-      child: DropdownButtonFormField<String>(
-        value: selectedRole,
-        hint: Text("Select your role"),
-        items: ["User", "Admin"].map((role) {
-          return DropdownMenuItem(
-            value: role,
-            child: Text(role),
-          );
-        }).toList(),
-        onChanged: (value) {
-          setState(() {
-            selectedRole = value;
-          });
-        },
-        decoration: InputDecoration(
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
-          contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-        ),
-      ),
-    );
-  }
-
-  Widget buildCustomInputField(String hint, TextEditingController controller, {bool isPassword = false}) {
+  Widget buildCustomInputField(String hint, TextEditingController controller,
+      {bool isPassword = false}) {
     return Padding(
       padding: EdgeInsets.only(bottom: 15),
       child: TextField(
