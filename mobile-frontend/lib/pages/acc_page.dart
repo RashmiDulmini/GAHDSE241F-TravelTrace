@@ -3,7 +3,8 @@ import 'package:traveltrace/pages/home_page.dart';
 import 'package:traveltrace/pages/navbar.dart';
 import 'package:traveltrace/pages/trail_create.dart';
 import 'package:traveltrace/pages/trail_search.dart';
-import 'package:traveltrace/pages/edit_profile.dart'; // Import Edit Profile page
+import 'package:traveltrace/pages/edit_profile.dart'; 
+import 'package:traveltrace/pages/password_change.dart';
 
 void main() {
   runApp(AccountApp());
@@ -78,7 +79,10 @@ class AccountScreen extends StatelessWidget {
               leading: Icon(Icons.lock),
               title: Text('Change Password'),
               onTap: () {
-                // Handle change password tap
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => PasswordChangeScreen()),
+                );
               },
             ),
             Divider(),
@@ -114,7 +118,7 @@ class AccountScreen extends StatelessWidget {
 
       // Bottom Navigation Bar
       bottomNavigationBar: Navbar(
-        selectedIndex: 3, // Setting this as the fourth page in navigation (Account)
+        selectedIndex: 3,
         onItemTapped: (index) {
           Navigator.pushReplacement(
             context,
