@@ -13,22 +13,9 @@ public class User {
     private String userName;
     private String address;
     private String contact;  // Matches JSON field name
-    private String email;
+     private String email;
     private String password;
     private String role;
-
-    //crete the CONSTRUCTOR
-
-
-    public User(String fullName, String userName, String address, String contact, String email, String password, String role) {
-        this.fullName = fullName;
-        this.userName = userName;
-        this.address = address;
-        this.contact = contact;
-        this.email = email;
-        this.password = password;
-        this.role = role;
-    }
 
     // Getters and Setters
     public Long getId() {
