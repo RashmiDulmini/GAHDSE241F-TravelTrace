@@ -39,7 +39,7 @@ class StartPage extends StatelessWidget {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => SignInPage()),
+                    MaterialPageRoute(builder: (context) => SignUpPage()),
                   );
                 },
                 style: ElevatedButton.styleFrom(
