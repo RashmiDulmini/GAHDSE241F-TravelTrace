@@ -28,21 +28,8 @@ class StartPage extends StatelessWidget {
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
                 color: Colors.blue.shade900, // Dark blue color
-              ),
-            ),
-            SizedBox(height: 20),
 
-            // Sign In Button
-            SizedBox(
-              width: 250,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => SignUpPage()),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
+
                   backgroundColor: Colors.blue, // Light blue
                   padding: EdgeInsets.symmetric(vertical: 15),
                   shape: RoundedRectangleBorder(
