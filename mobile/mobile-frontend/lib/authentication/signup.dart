@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:traveltrace/authentication/start_page.dart';
-import 'package:traveltrace/pages/home_page.dart';
+ import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class SignUpPage extends StatefulWidget {
   @override
@@ -8,130 +8,151 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
-  final TextEditingController fullNameController = TextEditingController();
-  final TextEditingController userNameController = TextEditingController();
-  final TextEditingController addressController = TextEditingController();
-  final TextEditingController contactController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _fullNameController = TextEditingController();
+  final TextEditingController _userNameController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _contactController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  String _role = 'user';
+  String _errorMessage = '';
 
-  void _signUp() {
-    if (fullNameController.text.isEmpty ||
-        userNameController.text.isEmpty ||
-        addressController.text.isEmpty ||
-        contactController.text.isEmpty ||
-        emailController.text.isEmpty ||
-        passwordController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Please fill all fields")),
-      );
-      return;
-    }
-
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => HomePage()),
+  Future<void> _signUp() async {
+    final url = Uri.parse('http://localhost:3030/api/users/register');
+    
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({
+        'fullName': _fullNameController.text,
+        'userName': _userNameController.text,
+        'address': _addressController.text,
+        'contact': _contactController.text,
+        'email': _emailController.text,
+        'password': _passwordController.text,
+        'role': _role,
+      }),
     );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      if (data != null && data['id'] != null) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Sign Up Successful!')));
+        // Optionally, navigate to another page after successful sign-up
+        // Navigator.pushReplacementNamed(context, '/home');
+      }
+    } else {
+      setState(() {
+        _errorMessage = 'Sign Up failed. Please try again.';
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(vertical: 40, horizontal: 20),
-              decoration: BoxDecoration(
-                color: Colors.blue,
-                borderRadius: BorderRadius.vertical(
-                  bottom: Radius.circular(20),
-                ),
-              ),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.arrow_back, color: Colors.white),
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => StartPage()),
-                      );
-                    },
-                  ),
-                  SizedBox(width: 20),
-                  Text(
-                    "Sign Up",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 20),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 30),
-              child: Column(
-                children: [
-                  buildCustomInputField("Who are you?", fullNameController),
-                  buildCustomInputField(
-                      "What is your username?", userNameController),
-                  buildCustomInputField("Enter address", addressController),
-                  buildCustomInputField(
-                      "Enter contact number", contactController),
-                  buildCustomInputField("Enter email", emailController),
-                  buildCustomInputField("Enter password", passwordController,
-                      isPassword: true),
-                  SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _signUp,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        padding: EdgeInsets.symmetric(vertical: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                      child: Text(
-                        "Sign Up",
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                ],
-              ),
-            ),
-          ],
+      appBar: AppBar(
+        backgroundColor: Colors.blue, // Set the AppBar background color to blue
+        title: Text('Sign Up'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
       ),
-    );
-  }
-
-  Widget buildCustomInputField(String hint, TextEditingController controller,
-      {bool isPassword = false}) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 15),
-      child: TextField(
-        controller: controller,
-        obscureText: isPassword,
-        decoration: InputDecoration(
-          hintText: hint,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            children: [
+              TextFormField(
+                controller: _fullNameController,
+                decoration: InputDecoration(labelText: 'Full Name'),
+                validator: (value) {
+                  if (value!.isEmpty) return 'Please enter your full name';
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: _userNameController,
+                decoration: InputDecoration(labelText: 'Username'),
+                validator: (value) {
+                  if (value!.isEmpty) return 'Please enter a username';
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: _addressController,
+                decoration: InputDecoration(labelText: 'Address'),
+                validator: (value) {
+                  if (value!.isEmpty) return 'Please enter your address';
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: _contactController,
+                decoration: InputDecoration(labelText: 'Contact'),
+                validator: (value) {
+                  if (value!.isEmpty) return 'Please enter your contact number';
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: _emailController,
+                decoration: InputDecoration(labelText: 'Email'),
+                keyboardType: TextInputType.emailAddress,
+                validator: (value) {
+                  if (value!.isEmpty || !value.contains('@'))
+                    return 'Please enter a valid email';
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: _passwordController,
+                decoration: InputDecoration(labelText: 'Password'),
+                obscureText: true,
+                validator: (value) {
+                  if (value!.isEmpty) return 'Please enter a password';
+                  return null;
+                },
+              ),
+              DropdownButtonFormField<String>(
+                value: _role,
+                items: ['user', 'admin']
+                    .map((role) => DropdownMenuItem<String>(
+                          value: role,
+                          child: Text(role),
+                        ))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _role = value!;
+                  });
+                },
+                decoration: InputDecoration(labelText: 'Role'),
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    _signUp();
+                  }
+                },
+                child: Text('Sign Up'),
+              ),
+              if (_errorMessage.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 10.0),
+                  child: Text(
+                    _errorMessage,
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
+            ],
           ),
-          contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         ),
       ),
     );
