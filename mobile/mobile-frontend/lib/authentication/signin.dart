@@ -19,8 +19,7 @@ class _SignInPageState extends State<SignInPage> {
       isLoading = true;
     });
 
-    final url = Uri.parse(
-        'http://localhost:3030/api/users/login'); // Correct IP for emulator
+    final url = Uri.parse('http://10.0.2.2:3030/api/users/register'); // Change IP if using real device
     try {
       final response = await http.post(
         url,
@@ -61,42 +60,6 @@ class _SignInPageState extends State<SignInPage> {
             ),
           ],
         ),
-      );
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
-
-  Future<void> loginUser(String email, String password) async {
-    setState(() {
-      isLoading = true;
-    });
-
-    final url = Uri.parse(
-        'http://localhost:3030/api/users/login'); // Correct IP for emulator
-    try {
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'email': email,
-          'password': password,
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        Navigator.pushReplacementNamed(
-            context, '/home'); // Navigate to HomePage
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login failed: ${response.body}')),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
       );
     } finally {
       setState(() {
@@ -196,8 +159,7 @@ class _SignInPageState extends State<SignInPage> {
                       ? null
                       : () {
                           if (email.isNotEmpty && password.isNotEmpty) {
-                            loginUser(
-                                email, password); // <-- Call loginUser here
+                            registerUser(email, password);
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
