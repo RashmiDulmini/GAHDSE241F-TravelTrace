@@ -3,7 +3,7 @@ package com.project.TravelTrace.service;
 import com.project.TravelTrace.entity.User;
 import com.project.TravelTrace.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
- import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
@@ -27,6 +27,11 @@ public class UserService {
     // Method to find a user by their email
     public User findByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    // Method to find a user by their ID
+    public User findById(Long id) {
+        return userRepository.findById(id).orElse(null);
     }
 
     // Method to check if the entered password matches the one in the database
