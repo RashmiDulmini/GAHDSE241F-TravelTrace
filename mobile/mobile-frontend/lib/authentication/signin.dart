@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:lottie/lottie.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:traveltrace/pages/main_screen.dart';
 
 class SignInPage extends StatefulWidget {
   @override
@@ -14,13 +15,12 @@ class _SignInPageState extends State<SignInPage> {
   String password = '';
   bool isLoading = false;
 
-  Future<void> registerUser(String email, String password) async {
+  Future<void> loginUser(String email, String password) async {
     setState(() {
       isLoading = true;
     });
 
-    final url = Uri.parse(
-        'http://localhost:3030/api/users/login'); // Correct IP for emulator
+    final url = Uri.parse('http://localhost:8080/api/users/login'); // Updated port to 8080
     try {
       final response = await http.post(
         url,
@@ -28,32 +28,33 @@ class _SignInPageState extends State<SignInPage> {
         body: jsonEncode({
           'email': email,
           'password': password,
+          'userName': '', // Adding required fields with empty values
+          'fullName': '',
+          'address': '',
+          'contact': '',
+          'role': 'user'
         }),
       );
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        showDialog(
-          context: context,
-          builder: (_) => AlertDialog(
-            title: Text('Success'),
-            content: Text('User registered successfully.'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text('OK'),
-              ),
-            ],
-          ),
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        // Store user data in shared preferences or state management solution here
+        
+        // Navigate to the MainScreen after successful login
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => MainScreen()),
         );
       } else {
-        throw Exception("Failed with status: ${response.statusCode}");
+        final errorData = jsonDecode(response.body);
+        throw Exception(errorData['message'] ?? 'Login failed');
       }
     } catch (e) {
       showDialog(
         context: context,
         builder: (_) => AlertDialog(
           title: Text('Error'),
-          content: Text('Registration failed.\n$e'),
+          content: Text('Login failed.\n${e.toString()}'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -61,42 +62,6 @@ class _SignInPageState extends State<SignInPage> {
             ),
           ],
         ),
-      );
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
-
-  Future<void> loginUser(String email, String password) async {
-    setState(() {
-      isLoading = true;
-    });
-
-    final url = Uri.parse(
-        'http://localhost:3030/api/users/login'); // Correct IP for emulator
-    try {
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'email': email,
-          'password': password,
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        Navigator.pushReplacementNamed(
-            context, '/home'); // Navigate to HomePage
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login failed: ${response.body}')),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
       );
     } finally {
       setState(() {
@@ -196,8 +161,7 @@ class _SignInPageState extends State<SignInPage> {
                       ? null
                       : () {
                           if (email.isNotEmpty && password.isNotEmpty) {
-                            loginUser(
-                                email, password); // <-- Call loginUser here
+                            loginUser(email, password);
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
