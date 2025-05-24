@@ -1,6 +1,7 @@
- import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:traveltrace/pages/main_screen.dart';
 
 class SignUpPage extends StatefulWidget {
   @override
@@ -19,32 +20,48 @@ class _SignUpPageState extends State<SignUpPage> {
   String _errorMessage = '';
 
   Future<void> _signUp() async {
-    final url = Uri.parse('http://localhost:3030/api/users/register');
+    final url = Uri.parse('http://localhost:8080/api/users/register');
     
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({
-        'fullName': _fullNameController.text,
-        'userName': _userNameController.text,
-        'address': _addressController.text,
-        'contact': _contactController.text,
-        'email': _emailController.text,
-        'password': _passwordController.text,
-        'role': _role,
-      }),
-    );
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'fullName': _fullNameController.text,
+          'userName': _userNameController.text,
+          'address': _addressController.text,
+          'contact': _contactController.text,
+          'email': _emailController.text,
+          'password': _passwordController.text,
+          'role': _role,
+        }),
+      );
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      if (data != null && data['id'] != null) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Sign Up Successful!')));
-        // Optionally, navigate to another page after successful sign-up
-        // Navigator.pushReplacementNamed(context, '/home');
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data != null && data['id'] != null) {
+          // Store user data in shared preferences or state management solution here
+          
+          // Show success message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Sign Up Successful!'))
+          );
+          
+          // Navigate to the main screen
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => MainScreen()),
+          );
+        }
+      } else {
+        final errorData = json.decode(response.body);
+        setState(() {
+          _errorMessage = errorData['message'] ?? 'Sign Up failed. Please try again.';
+        });
       }
-    } else {
+    } catch (e) {
       setState(() {
-        _errorMessage = 'Sign Up failed. Please try again.';
+        _errorMessage = 'An error occurred. Please try again later.';
       });
     }
   }

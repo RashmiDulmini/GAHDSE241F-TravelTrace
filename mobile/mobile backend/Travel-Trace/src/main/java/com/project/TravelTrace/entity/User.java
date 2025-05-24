@@ -25,7 +25,7 @@ public class User {
     private String password; // Store the encrypted password
     private String role;
 
-    // Constructor
+    // Constructor with all fields except id
     public User(String fullName, String userName, String address, String contact, String email, String password, String role) {
         this.fullName = fullName;
         this.userName = userName;
@@ -34,6 +34,10 @@ public class User {
         this.email = email;
         this.password = password;
         this.role = role;
+    }
+
+    // Default constructor required by JPA
+    public User() {
     }
 
     // Getters and Setters
