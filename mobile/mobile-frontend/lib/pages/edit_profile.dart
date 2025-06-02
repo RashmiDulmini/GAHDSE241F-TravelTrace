@@ -32,7 +32,7 @@ class ProfileUpdateScreen extends StatelessWidget {
             // Navigate back to Account Page
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => AccountScreen()),
+              MaterialPageRoute(builder: (context) => AccountApp()),
             );
           },
         ),

@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:lottie/lottie.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:traveltrace/pages/main_screen.dart';
+import 'package:traveltrace/providers/user_provider.dart';
 
 class SignInPage extends StatefulWidget {
   @override
@@ -20,7 +22,7 @@ class _SignInPageState extends State<SignInPage> {
       isLoading = true;
     });
 
-    final url = Uri.parse('http://localhost:8080/api/users/login'); // Updated port to 8080
+    final url = Uri.parse('http://localhost:8080/api/users/login');
     try {
       final response = await http.post(
         url,
@@ -28,19 +30,22 @@ class _SignInPageState extends State<SignInPage> {
         body: jsonEncode({
           'email': email,
           'password': password,
-          'userName': '', // Adding required fields with empty values
-          'fullName': '',
-          'address': '',
-          'contact': '',
-          'role': 'user'
         }),
       );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        // Store user data in shared preferences or state management solution here
-        
-        // Navigate to the MainScreen after successful login
+
+        // Set user data in provider using setUserInfo method
+        Provider.of<UserProvider>(context, listen: false).setUserInfo(
+          userId: data['id'].toString(),
+          userName: data['userName'] ?? '',
+          fullName: data['fullName'] ?? '',
+          email: data['email'] ?? '',
+          role: data['role'] ?? '',
+        );
+
+        // Navigate to the main screen
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => MainScreen()),
@@ -129,6 +134,7 @@ class _SignInPageState extends State<SignInPage> {
                 padding: EdgeInsets.symmetric(horizontal: 30),
                 child: TextField(
                   onChanged: (value) => email = value,
+                  keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
                     prefixIcon: Icon(Icons.email, color: Colors.black),
                     hintText: "Email",

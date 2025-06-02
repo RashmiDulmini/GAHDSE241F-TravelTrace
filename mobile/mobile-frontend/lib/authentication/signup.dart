@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:provider/provider.dart';
 import 'package:traveltrace/pages/main_screen.dart';
+import 'package:traveltrace/providers/user_provider.dart';
 
 class SignUpPage extends StatefulWidget {
   @override
@@ -21,7 +23,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   Future<void> _signUp() async {
     final url = Uri.parse('http://localhost:8080/api/users/register');
-    
+
     try {
       final response = await http.post(
         url,
@@ -40,13 +42,20 @@ class _SignUpPageState extends State<SignUpPage> {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data != null && data['id'] != null) {
-          // Store user data in shared preferences or state management solution here
-          
+          // Set user data in provider
+          Provider.of<UserProvider>(context, listen: false).setUserInfo(
+            userId: data['id'].toString(),
+            userName: data['userName'] ?? '',
+            fullName: data['fullName'] ?? '',
+            email: data['email'] ?? '',
+            role: data['role'] ?? ''
+          );
+
           // Show success message
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Sign Up Successful!'))
+            SnackBar(content: Text('Sign Up Successful!')),
           );
-          
+
           // Navigate to the main screen
           Navigator.pushReplacement(
             context,
@@ -56,7 +65,8 @@ class _SignUpPageState extends State<SignUpPage> {
       } else {
         final errorData = json.decode(response.body);
         setState(() {
-          _errorMessage = errorData['message'] ?? 'Sign Up failed. Please try again.';
+          _errorMessage =
+              errorData['message'] ?? 'Sign Up failed. Please try again.';
         });
       }
     } catch (e) {
@@ -70,7 +80,7 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blue, // Set the AppBar background color to blue
+        backgroundColor: Colors.blue,
         title: Text('Sign Up'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
@@ -88,53 +98,42 @@ class _SignUpPageState extends State<SignUpPage> {
               TextFormField(
                 controller: _fullNameController,
                 decoration: InputDecoration(labelText: 'Full Name'),
-                validator: (value) {
-                  if (value!.isEmpty) return 'Please enter your full name';
-                  return null;
-                },
+                validator: (value) =>
+                    value!.isEmpty ? 'Please enter your full name' : null,
               ),
               TextFormField(
                 controller: _userNameController,
                 decoration: InputDecoration(labelText: 'Username'),
-                validator: (value) {
-                  if (value!.isEmpty) return 'Please enter a username';
-                  return null;
-                },
+                validator: (value) =>
+                    value!.isEmpty ? 'Please enter a username' : null,
               ),
               TextFormField(
                 controller: _addressController,
                 decoration: InputDecoration(labelText: 'Address'),
-                validator: (value) {
-                  if (value!.isEmpty) return 'Please enter your address';
-                  return null;
-                },
+                validator: (value) =>
+                    value!.isEmpty ? 'Please enter your address' : null,
               ),
               TextFormField(
                 controller: _contactController,
                 decoration: InputDecoration(labelText: 'Contact'),
-                validator: (value) {
-                  if (value!.isEmpty) return 'Please enter your contact number';
-                  return null;
-                },
+                validator: (value) =>
+                    value!.isEmpty ? 'Please enter your contact number' : null,
               ),
               TextFormField(
                 controller: _emailController,
                 decoration: InputDecoration(labelText: 'Email'),
                 keyboardType: TextInputType.emailAddress,
-                validator: (value) {
-                  if (value!.isEmpty || !value.contains('@'))
-                    return 'Please enter a valid email';
-                  return null;
-                },
+                validator: (value) =>
+                    (value!.isEmpty || !value.contains('@'))
+                        ? 'Please enter a valid email'
+                        : null,
               ),
               TextFormField(
                 controller: _passwordController,
                 decoration: InputDecoration(labelText: 'Password'),
                 obscureText: true,
-                validator: (value) {
-                  if (value!.isEmpty) return 'Please enter a password';
-                  return null;
-                },
+                validator: (value) =>
+                    value!.isEmpty ? 'Please enter a password' : null,
               ),
               DropdownButtonFormField<String>(
                 value: _role,

@@ -28,7 +28,7 @@ class PasswordChangeScreen extends StatelessWidget {
           onPressed: () {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => AccountScreen()),
+              MaterialPageRoute(builder: (context) => AccountApp()),
             );
           },
         ),

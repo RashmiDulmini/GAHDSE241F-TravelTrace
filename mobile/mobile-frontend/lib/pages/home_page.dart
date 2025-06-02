@@ -1,28 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:traveltrace/pages/account_settings.dart';
 import 'package:traveltrace/pages/main_screen.dart';
 import 'package:traveltrace/pages/navbar.dart';
 import 'package:traveltrace/pages/trail_create.dart';
+import 'package:traveltrace/providers/user_provider.dart';
 
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
+    final userName = userProvider.userName.isNotEmpty ? userProvider.userName : 'Guest';
+    final userEmail = userProvider.email.isNotEmpty ? userProvider.email : 'guest@example.com';
+
     return Scaffold(
-      // Add an AppBar with the hamburger icon
       appBar: AppBar(
         title: Text('Home'),
         backgroundColor: Colors.blue,
       ),
-
-      // Add a Drawer (Hamburger Menu)
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
             DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.blue,
-              ),
+              decoration: BoxDecoration(color: Colors.blue),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -32,44 +33,38 @@ class HomePage extends StatelessWidget {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    'Jack',
+                    userName,
                     style: TextStyle(color: Colors.white, fontSize: 18),
                   ),
                   Text(
-                    'jack@example.com',
+                    userEmail,
                     style: TextStyle(color: Colors.white70, fontSize: 14),
                   ),
                 ],
               ),
             ),
-
-            // Account Settings Option
             ListTile(
               leading: Icon(Icons.settings),
               title: Text('Account Settings'),
               onTap: () {
-                Navigator.pop(context); // Close the drawer
+                Navigator.pop(context); // Close drawer
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => AccountSettingsPage()),
+                  MaterialPageRoute(builder: (context) => AccountSettingsPage()),
                 );
               },
             ),
-
-            // Other menu items (Optional)
             ListTile(
               leading: Icon(Icons.logout),
               title: Text('Logout'),
               onTap: () {
                 Navigator.pop(context);
-                // Implement logout logic here
+                // TODO: Add your logout logic here (e.g., clear userProvider, navigate to login)
               },
             ),
           ],
         ),
       ),
-
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -91,7 +86,7 @@ class HomePage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Hello Jack!',
+                            'Hello $userName!',
                             style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -138,7 +133,9 @@ class HomePage extends StatelessWidget {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      // TODO: Implement view all popular trails action
+                    },
                     child: Text('View all'),
                   ),
                 ],
@@ -164,8 +161,7 @@ class HomePage extends StatelessWidget {
                     children: [
                       Icon(Icons.image, size: 50, color: Colors.grey),
                       SizedBox(height: 5),
-                      Text('Trail ${index + 1}',
-                          style: TextStyle(fontSize: 14)),
+                      Text('Trail ${index + 1}', style: TextStyle(fontSize: 14)),
                     ],
                   ),
                 );
@@ -209,10 +205,13 @@ class HomePage extends StatelessWidget {
       bottomNavigationBar: Navbar(
         selectedIndex: 0,
         onItemTapped: (index) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => MainScreen()),
-          );
+          if (index != 0) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => MainScreen()),
+            );
+          }
+          // You can add navigation for other indices if Navbar has multiple items
         },
       ),
     );
