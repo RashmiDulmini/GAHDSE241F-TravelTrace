@@ -25,8 +25,11 @@ public class User {
     private String password; // Store the encrypted password
     private String role;
 
+    @Column(length = 1000)
+    private String profilePicture; // Base64 encoded profile picture
+
     // Constructor with all fields except id
-    public User(String fullName, String userName, String address, String contact, String email, String password, String role) {
+    public User(String fullName, String userName, String address, String contact, String email, String password, String role, String profilePicture) {
         this.fullName = fullName;
         this.userName = userName;
         this.address = address;
@@ -34,6 +37,7 @@ public class User {
         this.email = email;
         this.password = password;
         this.role = role;
+        this.profilePicture = profilePicture;
     }
 
     // Default constructor required by JPA
@@ -103,5 +107,13 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
     }
 }
