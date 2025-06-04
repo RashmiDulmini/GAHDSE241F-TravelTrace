@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:traveltrace/pages/favorite_page.dart';
+import 'package:traveltrace/pages/help_support.dart';
 import 'package:traveltrace/pages/main_screen.dart';
 import 'package:traveltrace/pages/my_trails.dart';
 import 'package:traveltrace/pages/navbar.dart';
@@ -73,6 +75,9 @@ class HomePage extends StatelessWidget {
               title: Text('Favorites'),
               onTap: () {
                 Navigator.pop(context);
+                Navigator.push(context,
+                MaterialPageRoute(builder: (context) => FavoritePage()),
+                );
                 // TODO: Navigate to Favorites Page
               },
             ),
@@ -81,6 +86,9 @@ class HomePage extends StatelessWidget {
               title: Text('Help & Support'),
               onTap: () {
                 Navigator.pop(context);
+                Navigator.push(context,
+                MaterialPageRoute(builder: (context) => HelpSupportPage()),
+                );
                 // TODO: Navigate to Help & Support Page
               },
             ),
