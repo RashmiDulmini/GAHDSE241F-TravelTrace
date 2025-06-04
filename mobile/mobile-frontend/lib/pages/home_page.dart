@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:traveltrace/pages/main_screen.dart';
+import 'package:traveltrace/pages/my_trails.dart';
 import 'package:traveltrace/pages/navbar.dart';
 import 'package:traveltrace/pages/profile_page.dart';
 import 'package:traveltrace/pages/trail_create.dart';
@@ -61,6 +62,9 @@ class HomePage extends StatelessWidget {
               title: Text('My Trails'),
               onTap: () {
                 Navigator.pop(context);
+                Navigator.push(context,
+                MaterialPageRoute(builder: (context) => MyTrailsPage()),
+                );
                 // TODO: Navigate to My Trails Page
               },
             ),
