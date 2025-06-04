@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:traveltrace/pages/account_settings.dart';
 import 'package:traveltrace/pages/main_screen.dart';
 import 'package:traveltrace/pages/navbar.dart';
+import 'package:traveltrace/pages/profile_page.dart';
 import 'package:traveltrace/pages/trail_create.dart';
 import 'package:traveltrace/providers/user_provider.dart';
 
@@ -44,14 +44,40 @@ class HomePage extends StatelessWidget {
               ),
             ),
             ListTile(
-              leading: Icon(Icons.settings),
-              title: Text('Account Settings'),
+              leading: Icon(Icons.person),
+              title: Text('Profile'),
               onTap: () {
-                Navigator.pop(context); // Close drawer
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => AccountSettingsPage()),
+                Navigator.pop(context);
+                Navigator.push(context,
+                MaterialPageRoute(builder: (context) => ProfilePage()),
                 );
+                // TODO: Navigate to Profile Page
+                
+
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.map),
+              title: Text('My Trails'),
+              onTap: () {
+                Navigator.pop(context);
+                // TODO: Navigate to My Trails Page
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.favorite),
+              title: Text('Favorites'),
+              onTap: () {
+                Navigator.pop(context);
+                // TODO: Navigate to Favorites Page
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.help),
+              title: Text('Help & Support'),
+              onTap: () {
+                Navigator.pop(context);
+                // TODO: Navigate to Help & Support Page
               },
             ),
             ListTile(
@@ -59,7 +85,7 @@ class HomePage extends StatelessWidget {
               title: Text('Logout'),
               onTap: () {
                 Navigator.pop(context);
-                // TODO: Add your logout logic here (e.g., clear userProvider, navigate to login)
+                // TODO: Add your logout logic here
               },
             ),
           ],
@@ -68,7 +94,6 @@ class HomePage extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Welcome Section
             Container(
               padding: EdgeInsets.all(16),
               color: Colors.blue,
@@ -88,9 +113,10 @@ class HomePage extends StatelessWidget {
                           Text(
                             'Hello $userName!',
                             style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                           ),
                           Text(
                             'Welcome to Travel Trace!',
@@ -121,8 +147,6 @@ class HomePage extends StatelessWidget {
                 ],
               ),
             ),
-
-            // Popular Trails Section
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Row(
@@ -141,8 +165,6 @@ class HomePage extends StatelessWidget {
                 ],
               ),
             ),
-
-            // Trails Grid Section
             GridView.builder(
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
@@ -167,10 +189,7 @@ class HomePage extends StatelessWidget {
                 );
               },
             ),
-
             SizedBox(height: 20),
-
-            // Create Trail Button
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: ElevatedButton(
@@ -178,7 +197,8 @@ class HomePage extends StatelessWidget {
                   backgroundColor: Colors.blue,
                   padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8)),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
                 onPressed: () {
                   Navigator.push(
@@ -191,8 +211,10 @@ class HomePage extends StatelessWidget {
                   children: [
                     Icon(Icons.add, color: Colors.white),
                     SizedBox(width: 8),
-                    Text('Create Your Trail',
-                        style: TextStyle(fontSize: 16, color: Colors.white)),
+                    Text(
+                      'Create Your Trail',
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
                   ],
                 ),
               ),
@@ -201,7 +223,6 @@ class HomePage extends StatelessWidget {
           ],
         ),
       ),
-
       bottomNavigationBar: Navbar(
         selectedIndex: 0,
         onItemTapped: (index) {
@@ -211,7 +232,6 @@ class HomePage extends StatelessWidget {
               MaterialPageRoute(builder: (context) => MainScreen()),
             );
           }
-          // You can add navigation for other indices if Navbar has multiple items
         },
       ),
     );
