@@ -1,50 +1,43 @@
 package com.project.TravelTrace.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import java.io.Serializable;
 
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
-@Table(name = "user") // Matches the database table name
-public class User {
+@Table(name = "users")  // or whatever table name you want
+public class User implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // Matches user_id in the database
+    private Long id;
 
+    @Column(name = "full_name", nullable = false)
     private String fullName;
 
-    @Column(name = "username")
+    @Column(name = "username", nullable = false, unique = true)
     private String userName;
 
-    private String address;
-    private String contact;
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
-    private String password; // Store the encrypted password
-    private String role;
 
-    @Column(length = 1000)
-    private String profilePicture; // Base64 encoded profile picture
+    @Column(name = "password", nullable = false)
+    private String password;
 
-    // Constructor with all fields except id
-    public User(String fullName, String userName, String address, String contact, String email, String password, String role, String profilePicture) {
-        this.fullName = fullName;
-        this.userName = userName;
-        this.address = address;
-        this.contact = contact;
-        this.email = email;
-        this.password = password;
-        this.role = role;
-        this.profilePicture = profilePicture;
-    }
+    @Column(name = "address")
+    private String address;
 
-    // Default constructor required by JPA
+    @Column(name = "contact")
+    private String contact;
+
+    @Column(name = "profile_picture")
+    private String profilePicture;  // Store path or URL to profile picture
+
+    // Default constructor
     public User() {
     }
 
     // Getters and Setters
+
     public Long getId() {
         return id;
     }
@@ -69,22 +62,6 @@ public class User {
         this.userName = userName;
     }
 
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getContact() {
-        return contact;
-    }
-
-    public void setContact(String contact) {
-        this.contact = contact;
-    }
-
     public String getEmail() {
         return email;
     }
@@ -101,12 +78,20 @@ public class User {
         this.password = password;
     }
 
-    public String getRole() {
-        return role;
+    public String getAddress() {
+        return address;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getContact() {
+        return contact;
+    }
+
+    public void setContact(String contact) {
+        this.contact = contact;
     }
 
     public String getProfilePicture() {

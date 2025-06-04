@@ -453,9 +453,9 @@
     },
     {
       "name": "video_player",
-      "rootUri": "file:///C:/Users/Rashmi%20Mendis/AppData/Local/Pub/Cache/hosted/pub.dev/video_player-2.9.5",
+      "rootUri": "file:///C:/Users/Rashmi%20Mendis/AppData/Local/Pub/Cache/hosted/pub.dev/video_player-2.10.0",
       "packageUri": "lib/",
-      "languageVersion": "3.4"
+      "languageVersion": "3.6"
     },
     {
       "name": "video_player_android",
@@ -506,7 +506,7 @@
       "languageVersion": "3.6"
     }
   ],
-  "generated": "2025-06-02T19:06:46.639006Z",
+  "generated": "2025-06-04T04:16:46.514457Z",
   "generator": "pub",
   "generatorVersion": "3.6.1",
   "flutterRoot": "file:///C:/flutter",

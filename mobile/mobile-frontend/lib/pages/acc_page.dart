@@ -42,7 +42,7 @@ class AccountApp extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => ProfileUpdateApp()),
+                  MaterialPageRoute(builder: (_) => EditProfilePage()),
                 );
               },
             ),

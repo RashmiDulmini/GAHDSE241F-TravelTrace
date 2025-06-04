@@ -1,149 +1,171 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:provider/provider.dart';
+import 'package:traveltrace/providers/user_provider.dart';
 
-void main() {
-  runApp(UpdateProfileApp());
+class UpdateProfilePage extends StatefulWidget {
+  @override
+  _UpdateProfilePageState createState() => _UpdateProfilePageState();
 }
 
-class UpdateProfileApp extends StatelessWidget {
+class _UpdateProfilePageState extends State<UpdateProfilePage> {
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _fullNameController = TextEditingController();
+  final TextEditingController _userNameController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _contactController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  String _role = 'user';
+  String _errorMessage = '';
+  String _successMessage = '';
+
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: UpdateProfileScreen(),
-      debugShowCheckedModeBanner: false,
-    );
+  void initState() {
+    super.initState();
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    _fullNameController.text = userProvider.fullName;
+    _userNameController.text = userProvider.userName;
+    _emailController.text = userProvider.email;
+    _role = userProvider.role;
   }
-}
 
-class UpdateProfileScreen extends StatefulWidget {
-  @override
-  _UpdateProfileScreenState createState() => _UpdateProfileScreenState();
-}
+  Future<void> _updateProfile() async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final url = Uri.parse('http://localhost:8080/api/users/update/${userProvider.userId}');
 
-class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
-  String selectedRole = 'Select your role';
-  final List<String> roles = ['Admin', 'User', 'Guest'];
+    try {
+      final response = await http.put(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'fullName': _fullNameController.text,
+          'userName': _userNameController.text,
+          'address': _addressController.text,
+          'contact': _contactController.text,
+          'email': _emailController.text,
+          'password': _passwordController.text,
+          'role': _role,
+        }),
+      );
 
-  final TextEditingController field1Controller = TextEditingController();
-  final TextEditingController field2Controller = TextEditingController();
-  final TextEditingController field3Controller = TextEditingController();
-  final TextEditingController field4Controller = TextEditingController();
-  final TextEditingController field5Controller = TextEditingController();
-  final TextEditingController field6Controller = TextEditingController();
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        Provider.of<UserProvider>(context, listen: false).setUserInfo(
+          userId: data['id'].toString(),
+          userName: data['userName'] ?? '',
+          fullName: data['fullName'] ?? '',
+          email: data['email'] ?? '',
+          role: data['role'] ?? '',
+        );
+
+        setState(() {
+          _successMessage = 'Profile updated successfully!';
+          _errorMessage = '';
+        });
+      } else {
+        final errorData = json.decode(response.body);
+        setState(() {
+          _errorMessage = errorData['message'] ?? 'Update failed.';
+          _successMessage = '';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'An error occurred. Please try again.';
+        _successMessage = '';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('update your profile'),
-        backgroundColor: Colors.cyan[700],
+        title: Text('Update Profile'),
+        backgroundColor: Colors.blue,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // Profile Picture
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: AssetImage('assets/profile.jpg'), // You can change this path
-              backgroundColor: Colors.grey[300],
-            ),
-            SizedBox(height: 16),
-
-            // Role Dropdown
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(12),
+        padding: EdgeInsets.all(16),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            children: [
+              TextFormField(
+                controller: _fullNameController,
+                decoration: InputDecoration(labelText: 'Full Name'),
+                validator: (value) => value!.isEmpty ? 'Enter full name' : null,
               ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  value: selectedRole,
-                  items: [
-                    DropdownMenuItem(
-                      value: 'Select your role',
-                      child: Text('Select your role'),
-                    ),
-                    ...roles.map((role) {
-                      return DropdownMenuItem(
-                        value: role,
-                        child: Text(role),
-                      );
-                    }),
-                  ],
-                  onChanged: (value) {
-                    setState(() {
-                      selectedRole = value!;
-                    });
-                  },
+              TextFormField(
+                controller: _userNameController,
+                decoration: InputDecoration(labelText: 'Username'),
+                validator: (value) => value!.isEmpty ? 'Enter username' : null,
+              ),
+              TextFormField(
+                controller: _addressController,
+                decoration: InputDecoration(labelText: 'Address'),
+              ),
+              TextFormField(
+                controller: _contactController,
+                decoration: InputDecoration(labelText: 'Contact'),
+              ),
+              TextFormField(
+                controller: _emailController,
+                decoration: InputDecoration(labelText: 'Email'),
+                keyboardType: TextInputType.emailAddress,
+                validator: (value) =>
+                    (value!.isEmpty || !value.contains('@')) ? 'Enter valid email' : null,
+              ),
+              TextFormField(
+                controller: _passwordController,
+                decoration: InputDecoration(labelText: 'New Password'),
+                obscureText: true,
+              ),
+              DropdownButtonFormField<String>(
+                value: _role,
+                items: ['user', 'admin']
+                    .map((role) => DropdownMenuItem(value: role, child: Text(role)))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _role = value!;
+                  });
+                },
+                decoration: InputDecoration(labelText: 'Role'),
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    _updateProfile();
+                  }
+                },
+                child: Text('Update Profile'),
+              ),
+              if (_successMessage.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 10.0),
+                  child: Text(
+                    _successMessage,
+                    style: TextStyle(color: Colors.green),
+                  ),
                 ),
-              ),
-            ),
-            SizedBox(height: 12),
-
-            // Text Fields
-            _buildTextField('Enter field 1', field1Controller),
-            SizedBox(height: 12),
-            _buildTextField('Enter field 2', field2Controller),
-            SizedBox(height: 12),
-            _buildTextField('Enter field 3', field3Controller),
-            SizedBox(height: 12),
-            _buildTextField('Enter field 4', field4Controller),
-            SizedBox(height: 12),
-            _buildTextField('Enter field 5', field5Controller),
-            SizedBox(height: 12),
-            _buildTextField('Enter field 6', field6Controller),
-
-            Spacer(),
-
-            // Save Button
-            ElevatedButton(
-              onPressed: () {
-                // Save logic here
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.cyan[700],
-                minimumSize: Size(double.infinity, 50),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+              if (_errorMessage.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 10.0),
+                  child: Text(
+                    _errorMessage,
+                    style: TextStyle(color: Colors.red),
+                  ),
                 ),
-              ),
-              child: Text('Save'),
-            ),
-          ],
-        ),
-      ),
-
-      // Bottom Navigation Bar
-      bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: Colors.cyan[700],
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.map), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
-        ],
-        onTap: (index) {
-          // Handle navigation
-        },
-      ),
-    );
-  }
-
-  Widget _buildTextField(String hint, TextEditingController controller) {
-    return TextField(
-      controller: controller,
-      decoration: InputDecoration(
-        hintText: hint,
-        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+            ],
+          ),
         ),
       ),
     );
