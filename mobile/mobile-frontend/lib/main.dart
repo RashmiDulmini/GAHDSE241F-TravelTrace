@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      initialRoute: '/getstarted',  // Start at GetStartedPage
+      initialRoute: '/getstarted',  
       routes: {
         '/getstarted': (context) => GetStartedPage(),
         '/signin': (context) => SignInPage(),
