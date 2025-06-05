@@ -1,8 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
     <application
-        android:label="traveltrace"
+        android:label="Travel Trace"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+
+        <!-- Add your Google Maps API key here -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="YOUR_API_KEY_HERE"/>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -31,15 +43,6 @@
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
-
-<manifest>
-    <application>
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyA5OqtYTRRp1QNPdtj15x9yHIe4XlwOd0s" /> <!--Google map API key-->
-    </application>
-</manifest>
-
 
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
