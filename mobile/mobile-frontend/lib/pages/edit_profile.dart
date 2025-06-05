@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:provider/provider.dart';
 import '../providers/user_provider.dart';
+import 'route_picker.dart';
 
 class EditProfilePage extends StatefulWidget {
   @override
@@ -19,6 +20,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   bool isEditingEmail = false;
   bool isEditingAddress = false;
   bool isEditingContact = false;
+  bool _isUploading = false;
 
   late TextEditingController fullNameController;
   late TextEditingController usernameController;
@@ -33,15 +35,131 @@ class _EditProfilePageState extends State<EditProfilePage> {
     fullNameController = TextEditingController(text: userProvider.fullName);
     usernameController = TextEditingController(text: userProvider.userName);
     emailController = TextEditingController(text: userProvider.email);
-    addressController = TextEditingController(); // Optionally preload
-    contactController = TextEditingController(); // Optionally preload
+    addressController = TextEditingController(text: userProvider.address);
+    contactController = TextEditingController(text: userProvider.contact);
   }
 
-  Future<void> _pickImage() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final pickedFile = await picker.pickImage(
+        source: source,
+        imageQuality: 50, // Compress image
+      );
+      
+      if (pickedFile != null) {
+        setState(() {
+          _image = File(pickedFile.path);
+        });
+        
+        // Upload immediately after picking
+        await _uploadProfilePicture();
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to pick image: ${e.toString()}')),
+      );
+    }
+  }
+
+  Future<void> _uploadProfilePicture() async {
+    if (_image == null) return;
+
     setState(() {
-      if (pickedFile != null) _image = File(pickedFile.path);
+      _isUploading = true;
     });
+
+    try {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final url = Uri.parse('http://localhost:8080/api/users/${userProvider.userId}/profile-picture');
+
+      var request = http.MultipartRequest('POST', url);
+      request.files.add(await http.MultipartFile.fromPath('file', _image!.path));
+
+      var response = await request.send();
+      var responseData = await response.stream.bytesToString();
+      var data = json.decode(responseData);
+
+      if (response.statusCode == 200) {
+        userProvider.updateProfilePicture(data['profilePicture']);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Profile picture updated successfully')),
+        );
+      } else {
+        throw Exception(data['message'] ?? 'Failed to upload profile picture');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to upload profile picture: ${e.toString()}')),
+      );
+    } finally {
+      setState(() {
+        _isUploading = false;
+      });
+    }
+  }
+
+  Future<void> _removeProfilePicture() async {
+    try {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final url = Uri.parse('http://localhost:8080/api/users/${userProvider.userId}/profile-picture');
+
+      final response = await http.delete(url);
+      final data = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        setState(() {
+          _image = null;
+        });
+        userProvider.updateProfilePicture(null);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Profile picture removed successfully')),
+        );
+      } else {
+        throw Exception(data['message'] ?? 'Failed to remove profile picture');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to remove profile picture: ${e.toString()}')),
+      );
+    }
+  }
+
+  Future<void> _selectRoutePoints() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => RoutePicker()),
+    );
+
+    if (result != null) {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final url = Uri.parse('http://localhost:8080/api/users/${userProvider.userId}/location');
+
+      try {
+        final response = await http.put(
+          url,
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+          body: {
+            'latitude': result['start'].latitude.toString(),
+            'longitude': result['start'].longitude.toString(),
+            'endLatitude': result['end'].latitude.toString(),
+            'endLongitude': result['end'].longitude.toString(),
+          },
+        );
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Route points saved successfully')),
+          );
+        } else {
+          throw Exception('Failed to save route points');
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to save route points: ${e.toString()}')),
+        );
+      }
+    }
   }
 
   Future<void> _updateProfile() async {
@@ -62,21 +180,165 @@ class _EditProfilePageState extends State<EditProfilePage> {
       );
 
       if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Profile updated')));
+        final data = json.decode(response.body);
         userProvider.setUserInfo(
           userId: userProvider.userId,
-          userName: usernameController.text,
-          fullName: fullNameController.text,
-          email: emailController.text,
+          userName: data['userName'] ?? '',
+          fullName: data['fullName'] ?? '',
+          email: data['email'] ?? '',
           role: userProvider.role,
+          address: data['address'] ?? '',
+          contact: data['contact'] ?? '',
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Profile updated successfully')),
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Update failed')));
+        final errorData = json.decode(response.body);
+        throw Exception(errorData['message'] ?? 'Update failed');
       }
     } catch (e) {
-      print(e);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('An error occurred')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update profile: ${e.toString()}')),
+      );
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
+    String? profilePicture = userProvider.profilePicture;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Edit Profile'),
+        backgroundColor: Colors.cyan[700],
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Stack(
+              children: [
+                CircleAvatar(
+                  radius: 60,
+                  backgroundImage: _image != null
+                      ? FileImage(_image!)
+                      : (profilePicture != null
+                          ? NetworkImage('http://localhost:8080/uploads/profile-pictures/$profilePicture')
+                          : AssetImage('assets/profile.jpg')) as ImageProvider,
+                  backgroundColor: Colors.grey[300],
+                ),
+                if (_isUploading)
+                  Positioned.fill(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black38,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      ),
+                    ),
+                  ),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (profilePicture != null)
+                        GestureDetector(
+                          onTap: _removeProfilePicture,
+                          child: CircleAvatar(
+                            radius: 18,
+                            backgroundColor: Colors.red,
+                            child: Icon(Icons.delete, color: Colors.white, size: 20),
+                          ),
+                        ),
+                      SizedBox(width: 8),
+                      PopupMenuButton<ImageSource>(
+                        onSelected: _pickImage,
+                        itemBuilder: (context) => [
+                          PopupMenuItem(
+                            value: ImageSource.camera,
+                            child: ListTile(
+                              leading: Icon(Icons.camera_alt),
+                              title: Text('Take Photo'),
+                            ),
+                          ),
+                          PopupMenuItem(
+                            value: ImageSource.gallery,
+                            child: ListTile(
+                              leading: Icon(Icons.photo_library),
+                              title: Text('Choose from Gallery'),
+                            ),
+                          ),
+                        ],
+                        child: CircleAvatar(
+                          radius: 18,
+                          backgroundColor: Colors.blue,
+                          child: Icon(Icons.camera_alt, color: Colors.white),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 24),
+            _buildEditableField('Full Name', fullNameController, isEditingFullName, () {
+              setState(() {
+                isEditingFullName = !isEditingFullName;
+                if (!isEditingFullName) _updateProfile();
+              });
+            }),
+            _buildEditableField('Username', usernameController, isEditingUsername, () {
+              setState(() {
+                isEditingUsername = !isEditingUsername;
+                if (!isEditingUsername) _updateProfile();
+              });
+            }),
+            _buildEditableField('Email', emailController, isEditingEmail, () {
+              setState(() {
+                isEditingEmail = !isEditingEmail;
+                if (!isEditingEmail) _updateProfile();
+              });
+            }),
+            _buildEditableField('Address', addressController, isEditingAddress, () {
+              setState(() {
+                isEditingAddress = !isEditingAddress;
+                if (!isEditingAddress) _updateProfile();
+              });
+            }),
+            _buildEditableField('Contact', contactController, isEditingContact, () {
+              setState(() {
+                isEditingContact = !isEditingContact;
+                if (!isEditingContact) _updateProfile();
+              });
+            }),
+            SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: _selectRoutePoints,
+              icon: Icon(Icons.map),
+              label: Text('Select Route Points'),
+              style: ElevatedButton.styleFrom(
+                minimumSize: Size(double.infinity, 50),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildEditableField(String label, TextEditingController controller, bool isEditing, VoidCallback onEditPressed) {
@@ -91,87 +353,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
           ),
         ),
         IconButton(
-          icon: Icon(Icons.edit, color: Colors.blue),
+          icon: Icon(isEditing ? Icons.check : Icons.edit, color: Colors.blue),
           onPressed: onEditPressed,
         ),
       ],
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final userProvider = Provider.of<UserProvider>(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Edit Profile'),
-        backgroundColor: Colors.cyan[700],
-        leading: IconButton(icon: Icon(Icons.arrow_back), onPressed: () => Navigator.pop(context)),
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Stack(
-              children: [
-                CircleAvatar(
-                  radius: 60,
-                  backgroundImage: _image != null ? FileImage(_image!) : AssetImage('assets/profile.jpg') as ImageProvider,
-                  backgroundColor: Colors.grey[300],
-                ),
-                Positioned(
-                  bottom: 0,
-                  right: 4,
-                  child: GestureDetector(
-                    onTap: _pickImage,
-                    child: CircleAvatar(
-                      radius: 18,
-                      backgroundColor: Colors.white,
-                      child: Icon(Icons.camera_alt, color: Colors.black),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 24),
-            _buildEditableField('Full Name', fullNameController, isEditingFullName, () {
-              setState(() {
-                isEditingFullName = !isEditingFullName;
-              });
-            }),
-            _buildEditableField('Username', usernameController, isEditingUsername, () {
-              setState(() {
-                isEditingUsername = !isEditingUsername;
-              });
-            }),
-            _buildEditableField('Email', emailController, isEditingEmail, () {
-              setState(() {
-                isEditingEmail = !isEditingEmail;
-              });
-            }),
-            _buildEditableField('Address', addressController, isEditingAddress, () {
-              setState(() {
-                isEditingAddress = !isEditingAddress;
-              });
-            }),
-            _buildEditableField('Contact', contactController, isEditingContact, () {
-              setState(() {
-                isEditingContact = !isEditingContact;
-              });
-            }),
-            SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: _updateProfile,
-              icon: Icon(Icons.save),
-              label: Text('Save Changes'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.cyan[700],
-                minimumSize: Size(double.infinity, 50),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
