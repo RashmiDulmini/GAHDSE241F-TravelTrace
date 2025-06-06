@@ -1,130 +1,163 @@
 import 'package:flutter/material.dart';
-import 'package:traveltrace/pages/acc_page.dart';
-import 'package:traveltrace/pages/navbar.dart';
+import 'package:provider/provider.dart';
+import 'package:traveltrace/providers/user_provider.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-void main() {
-  runApp(PasswordChangeApp());
+class PasswordChangeScreen extends StatefulWidget {
+  @override
+  _PasswordChangeScreenState createState() => _PasswordChangeScreenState();
 }
 
-class PasswordChangeApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: PasswordChangeScreen(),
-    );
+class _PasswordChangeScreenState extends State<PasswordChangeScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _currentPasswordController = TextEditingController();
+  final _newPasswordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+
+  bool _isLoading = false;
+
+  Future<void> _changePassword(int userId) async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final url = Uri.parse('http://localhost:8080/api/users/change-password/$userId');
+
+    final body = jsonEncode({
+      'currentPassword': _currentPasswordController.text,
+      'newPassword': _newPasswordController.text,
+      'confirmPassword': _confirmPasswordController.text,
+    });
+
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      final response = await http.put(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: body,
+      );
+
+      final responseData = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(responseData['message'] ?? 'Password changed successfully')),
+        );
+        _currentPasswordController.clear();
+        _newPasswordController.clear();
+        _confirmPasswordController.clear();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(responseData['message'] ?? 'Failed to change password')),
+        );
+      }
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $error')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
-}
 
-class PasswordChangeScreen extends StatelessWidget {
+  @override
+  void dispose() {
+    _currentPasswordController.dispose();
+    _newPasswordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
+    final userIdString = userProvider.userId;
+    // You might need to parse userId from String to int or long depending on your implementation
+    final userId = int.tryParse(userIdString) ?? 0;
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFF23A7F1),
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => AccountApp()),
-            );
-          },
-        ),
-        title: Text(
-          "Change Password",
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
+        title: const Text('Change Password'),
+        backgroundColor: Colors.cyan[700],
       ),
       body: Padding(
-        padding: EdgeInsets.all(20),
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            // Password Form Container
-            Container(
-              margin: EdgeInsets.only(top: 50),
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 60),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.black12),
-              ),
-              child: Column(
-                children: [
-                  _buildTextField("Current Password"),
-                  _buildTextField("New Password"),
-                  _buildTextField("Confirm Password"),
-                  SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Handle password change logic
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      padding: EdgeInsets.symmetric(horizontal: 60, vertical: 15),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+        padding: const EdgeInsets.all(16.0),
+        child: userId == 0
+            ? Center(child: Text('User not logged in'))
+            : Form(
+                key: _formKey,
+                child: ListView(
+                  children: [
+                    TextFormField(
+                      controller: _currentPasswordController,
+                      decoration: const InputDecoration(
+                        labelText: 'Current Password',
+                        border: OutlineInputBorder(),
+                      ),
+                      obscureText: true,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your current password';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _newPasswordController,
+                      decoration: const InputDecoration(
+                        labelText: 'New Password',
+                        border: OutlineInputBorder(),
+                      ),
+                      obscureText: true,
+                      validator: (value) {
+                        if (value == null || value.length < 6) {
+                          return 'New password must be at least 6 characters';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _confirmPasswordController,
+                      decoration: const InputDecoration(
+                        labelText: 'Confirm New Password',
+                        border: OutlineInputBorder(),
+                      ),
+                      obscureText: true,
+                      validator: (value) {
+                        if (value != _newPasswordController.text) {
+                          return 'Passwords do not match';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 32),
+                    SizedBox(
+                      height: 48,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.cyan[700],
+                        ),
+                        onPressed: _isLoading
+                            ? null
+                            : () {
+                                _changePassword(userId);
+                              },
+                        child: _isLoading
+                            ? const CircularProgressIndicator(
+                                color: Colors.white,
+                              )
+                            : const Text('Submit'),
                       ),
                     ),
-                    child: Text(
-                      "Submit",
-                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Positioned Key Icon
-            Positioned(
-              top: 10,
-              left: 0,
-              right: 0,
-              child: Align(
-                alignment: Alignment.center,
-                child: CircleAvatar(
-                  radius: 35,
-                  backgroundColor: Colors.grey[300],
-                  child: Icon(Icons.vpn_key, size: 40, color: Colors.indigo),
+                  ],
                 ),
               ),
-            ),
-          ],
-        ),
-      ),
-
-      // Bottom Navigation Bar
-      bottomNavigationBar: Navbar(
-        selectedIndex: 3,
-        onItemTapped: (index) {
-          Navigator.pushReplacementNamed(
-            context,
-            index == 0 ? '/home' :
-            index == 1 ? '/trail_create' :
-            index == 2 ? '/trail_search' :
-            '/account',
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildTextField(String hint) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: TextField(
-        obscureText: true,
-        decoration: InputDecoration(
-          hintText: hint,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(25),
-          ),
-          contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-        ),
       ),
     );
   }

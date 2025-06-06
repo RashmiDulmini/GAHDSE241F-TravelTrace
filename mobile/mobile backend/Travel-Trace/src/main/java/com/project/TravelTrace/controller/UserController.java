@@ -7,6 +7,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+// Add this import if not already present
+import java.util.Optional;
+
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,13 +48,10 @@ public class UserController {
                         .body(Map.of("message", "Username already exists"));
             }
 
-            // Save user
             User savedUser = userRepository.save(user);
+            savedUser.setPassword(null); // hide password
 
-            // Hide password before returning
-            savedUser.setPassword(null);
-            return ResponseEntity.ok(savedUser);
-
+            return ResponseEntity.ok(savedUser); // returns full user object
         } catch (Exception e) {
             logger.error("Error during registration", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -74,7 +75,7 @@ public class UserController {
             }
 
             if (existingUser.getPassword().equals(user.getPassword())) {
-                existingUser.setPassword(null);
+                existingUser.setPassword(null); // hide password
                 return ResponseEntity.ok(existingUser);
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -95,7 +96,6 @@ public class UserController {
         }
 
         try {
-            // Find user by id first
             var optionalUser = userRepository.findById(id);
 
             if (optionalUser.isPresent()) {
@@ -126,4 +126,52 @@ public class UserController {
                     .body(Map.of("message", "Internal error updating user"));
         }
     }
+
+    // Change user password
+    @PutMapping("/change-password/{id}")
+    public ResponseEntity<?> changePassword(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> passwordData) {
+
+        try {
+            Optional<User> optionalUser = userRepository.findById(id);
+
+            if (optionalUser.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("message", "User not found"));
+            }
+
+            User user = optionalUser.get();
+
+            String currentPassword = passwordData.get("currentPassword");
+            String newPassword = passwordData.get("newPassword");
+            String confirmPassword = passwordData.get("confirmPassword");
+
+            if (currentPassword == null || newPassword == null || confirmPassword == null) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("message", "All password fields are required"));
+            }
+
+            if (!user.getPassword().equals(currentPassword)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("message", "Current password is incorrect"));
+            }
+
+            if (!newPassword.equals(confirmPassword)) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("message", "New password and confirm password do not match"));
+            }
+
+            user.setPassword(newPassword);
+            userRepository.save(user);
+
+            return ResponseEntity.ok(Map.of("message", "Password changed successfully"));
+
+        } catch (Exception e) {
+            logger.error("Error changing password", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Internal error while changing password"));
+        }
+    }
+
 }

@@ -48,7 +48,9 @@ class _SignUpPageState extends State<SignUpPage> {
             userName: data['userName'] ?? '',
             fullName: data['fullName'] ?? '',
             email: data['email'] ?? '',
-            role: data['role'] ?? ''
+            role: data['role'] ?? '',
+            address: data['address'] ?? '',
+            contact: data['contact'] ?? '',
           );
 
           // Show success message

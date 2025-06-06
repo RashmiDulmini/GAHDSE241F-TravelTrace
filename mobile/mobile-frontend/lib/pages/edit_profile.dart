@@ -5,7 +5,6 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:provider/provider.dart';
 import '../providers/user_provider.dart';
-import 'route_picker.dart';
 
 class EditProfilePage extends StatefulWidget {
   @override
@@ -41,17 +40,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   Future<void> _pickImage(ImageSource source) async {
     try {
-      final pickedFile = await picker.pickImage(
-        source: source,
-        imageQuality: 50, // Compress image
-      );
-      
+      final pickedFile = await picker.pickImage(source: source, imageQuality: 50);
       if (pickedFile != null) {
         setState(() {
           _image = File(pickedFile.path);
         });
-        
-        // Upload immediately after picking
         await _uploadProfilePicture();
       }
     } catch (e) {
@@ -63,10 +56,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   Future<void> _uploadProfilePicture() async {
     if (_image == null) return;
-
-    setState(() {
-      _isUploading = true;
-    });
+    setState(() => _isUploading = true);
 
     try {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
@@ -74,7 +64,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
       var request = http.MultipartRequest('POST', url);
       request.files.add(await http.MultipartFile.fromPath('file', _image!.path));
-
       var response = await request.send();
       var responseData = await response.stream.bytesToString();
       var data = json.decode(responseData);
@@ -92,9 +81,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         SnackBar(content: Text('Failed to upload profile picture: ${e.toString()}')),
       );
     } finally {
-      setState(() {
-        _isUploading = false;
-      });
+      setState(() => _isUploading = false);
     }
   }
 
@@ -121,44 +108,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to remove profile picture: ${e.toString()}')),
       );
-    }
-  }
-
-  Future<void> _selectRoutePoints() async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => RoutePicker()),
-    );
-
-    if (result != null) {
-      final userProvider = Provider.of<UserProvider>(context, listen: false);
-      final url = Uri.parse('http://localhost:8080/api/users/${userProvider.userId}/location');
-
-      try {
-        final response = await http.put(
-          url,
-          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-          body: {
-            'latitude': result['start'].latitude.toString(),
-            'longitude': result['start'].longitude.toString(),
-            'endLatitude': result['end'].latitude.toString(),
-            'endLongitude': result['end'].longitude.toString(),
-          },
-        );
-
-        if (response.statusCode == 200) {
-          final data = json.decode(response.body);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Route points saved successfully')),
-          );
-        } else {
-          throw Exception('Failed to save route points');
-        }
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to save route points: ${e.toString()}')),
-        );
-      }
     }
   }
 
@@ -202,6 +151,25 @@ class _EditProfilePageState extends State<EditProfilePage> {
         SnackBar(content: Text('Failed to update profile: ${e.toString()}')),
       );
     }
+  }
+
+  Widget _buildEditableField(String label, TextEditingController controller, bool isEditing, VoidCallback onEditPressed) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(
+          child: TextField(
+            controller: controller,
+            enabled: isEditing,
+            decoration: InputDecoration(labelText: label),
+          ),
+        ),
+        IconButton(
+          icon: Icon(isEditing ? Icons.check : Icons.edit, color: Colors.blue),
+          onPressed: onEditPressed,
+        ),
+      ],
+    );
   }
 
   @override
@@ -323,40 +291,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 if (!isEditingContact) _updateProfile();
               });
             }),
-            SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: _selectRoutePoints,
-              icon: Icon(Icons.map),
-              label: Text('Select Route Points'),
-              style: ElevatedButton.styleFrom(
-                minimumSize: Size(double.infinity, 50),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildEditableField(String label, TextEditingController controller, bool isEditing, VoidCallback onEditPressed) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Expanded(
-          child: TextField(
-            controller: controller,
-            enabled: isEditing,
-            decoration: InputDecoration(labelText: label),
-          ),
-        ),
-        IconButton(
-          icon: Icon(isEditing ? Icons.check : Icons.edit, color: Colors.blue),
-          onPressed: onEditPressed,
-        ),
-      ],
     );
   }
 }
