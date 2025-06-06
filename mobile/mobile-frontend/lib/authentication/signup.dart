@@ -1,3 +1,4 @@
+// ... (same imports)
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -42,7 +43,6 @@ class _SignUpPageState extends State<SignUpPage> {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data != null && data['id'] != null) {
-          // Set user data in provider
           Provider.of<UserProvider>(context, listen: false).setUserInfo(
             userId: data['id'].toString(),
             userName: data['userName'] ?? '',
@@ -53,12 +53,10 @@ class _SignUpPageState extends State<SignUpPage> {
             contact: data['contact'] ?? '',
           );
 
-          // Show success message
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Sign Up Successful!')),
           );
 
-          // Navigate to the main screen
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => MainScreen()),
@@ -134,8 +132,14 @@ class _SignUpPageState extends State<SignUpPage> {
                 controller: _passwordController,
                 decoration: InputDecoration(labelText: 'Password'),
                 obscureText: true,
-                validator: (value) =>
-                    value!.isEmpty ? 'Please enter a password' : null,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a password';
+                  } else if (value.length < 6) {
+                    return 'Password must be at least 6 characters';
+                  }
+                  return null;
+                },
               ),
               DropdownButtonFormField<String>(
                 value: _role,
