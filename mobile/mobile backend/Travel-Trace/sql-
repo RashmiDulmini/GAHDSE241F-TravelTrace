@@ -1,153 +1,51 @@
--- phpMyAdmin SQL Dump
--- version 5.2.1
--- https://www.phpmyadmin.net/
---
--- Host: 127.0.0.1:3306
--- Generation Time: Jun 07, 2025 at 04:01 PM
--- Server version: 8.3.0
--- PHP Version: 8.2.18
+ CREATE DATABASE travel_trace;
+USE travel_trace;
 
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
-SET time_zone = "+00:00";
+-- Create role table
+CREATE TABLE role (
+    role_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    role_name VARCHAR(50) NOT NULL UNIQUE
+);
+
+-- Create user table
+CREATE TABLE user ( 
+    id BIGINT AUTO_INCREMENT PRIMARY KEY, 
+    full_name VARCHAR(191) NOT NULL, 
+    user_name VARCHAR(191) NOT NULL, 
+    password VARCHAR(191) NOT NULL, 
+    email VARCHAR(191) NOT NULL UNIQUE, 
+    address VARCHAR(191), 
+    contact VARCHAR(20), 
+    religion VARCHAR(50), 
+    role_id BIGINT NOT NULL, 
+    FOREIGN KEY (role_id) REFERENCES role(role_id) 
+);
+INSERT INTO role (role_name) VALUES ('Admin'), ('User');
+CREATE INDEX idx_email ON user(email);
 
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
---
--- Database: `travel_trace`
---
-
--- --------------------------------------------------------
-
---
--- Table structure for table `content`
---
-
-DROP TABLE IF EXISTS `content`;
-CREATE TABLE IF NOT EXISTS `content` (
-  `content_id` bigint NOT NULL AUTO_INCREMENT,
-  `content_type` varchar(255) DEFAULT NULL,
-  `file_path` varchar(255) DEFAULT NULL,
-  `text_content` varchar(255) DEFAULT NULL,
-  `created_person` bigint NOT NULL,
-  `trail_id` bigint NOT NULL,
-  PRIMARY KEY (`content_id`),
-  KEY `FKsycqmhlf16ljyvpd0ggthy04v` (`created_person`),
-  KEY `FKs3xe94k7kn9cnj1uuphbgg9yu` (`trail_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `location`
---
-
-DROP TABLE IF EXISTS `location`;
-CREATE TABLE IF NOT EXISTS `location` (
-  `location_id` bigint NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) DEFAULT NULL,
-  `type` varchar(255) DEFAULT NULL,
-  `parent_location_id` bigint DEFAULT NULL,
-  PRIMARY KEY (`location_id`),
-  KEY `FK9s1sco601u8l6ptdxf432h4kb` (`parent_location_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `role`
---
-
-DROP TABLE IF EXISTS `role`;
-CREATE TABLE IF NOT EXISTS `role` (
-  `role_id` bigint NOT NULL AUTO_INCREMENT,
-  `role_name` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`role_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `trail`
---
-
-DROP TABLE IF EXISTS `trail`;
-CREATE TABLE IF NOT EXISTS `trail` (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `created_at` datetime(6) DEFAULT NULL,
-  `description` varchar(255) DEFAULT NULL,
-  `end_latitude` double DEFAULT NULL,
-  `end_longitude` double DEFAULT NULL,
-  `media_type` varchar(255) DEFAULT NULL,
-  `media_url` varchar(1000) DEFAULT NULL,
-  `name` varchar(255) DEFAULT NULL,
-  `start_latitude` double DEFAULT NULL,
-  `start_longitude` double DEFAULT NULL,
-  `trail_name` varchar(255) DEFAULT NULL,
-  `user_id` bigint DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `FKlc26seccmv9gp92lx5rkpoyit` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `users`
---
-
-DROP TABLE IF EXISTS `users`;
-CREATE TABLE IF NOT EXISTS `users` (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `address` varchar(255) DEFAULT NULL,
-  `contact` varchar(255) DEFAULT NULL,
-  `email` varchar(255) NOT NULL,
-  `full_name` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `profile_picture` varchar(255) DEFAULT NULL,
-  `username` varchar(255) NOT NULL,
-  `latitude` double DEFAULT NULL,
-  `location_name` varchar(255) DEFAULT NULL,
-  `longitude` double DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `UK6dotkott2kjsp8vw4d0m25fb7` (`email`),
-  UNIQUE KEY `UKr43af9ap4edm43mmtq01oddj6` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Dumping data for table `users`
---
-
-INSERT INTO `users` (`id`, `address`, `contact`, `email`, `full_name`, `password`, `profile_picture`, `username`, `latitude`, `location_name`, `longitude`) VALUES
-(1, '', '', 'nethmitk33@gmail.com', 'MS.Thlikoralage nethmi sandheepanie', 'nethmitk33@gmail.com', NULL, 'nethmitk33', NULL, NULL, NULL);
-
---
--- Constraints for dumped tables
---
-
---
--- Constraints for table `content`
---
-ALTER TABLE `content`
-  ADD CONSTRAINT `FKs3xe94k7kn9cnj1uuphbgg9yu` FOREIGN KEY (`trail_id`) REFERENCES `trail` (`id`),
-  ADD CONSTRAINT `FKsycqmhlf16ljyvpd0ggthy04v` FOREIGN KEY (`created_person`) REFERENCES `users` (`id`);
-
---
--- Constraints for table `location`
---
-ALTER TABLE `location`
-  ADD CONSTRAINT `FK9s1sco601u8l6ptdxf432h4kb` FOREIGN KEY (`parent_location_id`) REFERENCES `location` (`location_id`);
-
---
--- Constraints for table `trail`
---
-ALTER TABLE `trail`
-  ADD CONSTRAINT `FKlc26seccmv9gp92lx5rkpoyit` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
-COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+CREATE TABLE location (
+    location_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(191) NOT NULL,
+    type VARCHAR(191),
+    parent_location_id BIGINT,
+    FOREIGN KEY (parent_location_id) REFERENCES location(location_id)
+);
+CREATE TABLE trail (
+    trail_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(191) NOT NULL,
+    location_id BIGINT NOT NULL,
+    created_person BIGINT NOT NULL,
+    FOREIGN KEY (location_id) REFERENCES location(location_id),
+    FOREIGN KEY (created_person) REFERENCES `user`(user_id)
+);
+CREATE TABLE content (
+    content_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    text_content TEXT,
+    file_path VARCHAR(191),
+    content_type VARCHAR(191),
+    trail_id BIGINT NOT NULL,
+    created_person BIGINT NOT NULL,
+    FOREIGN KEY (trail_id) REFERENCES trail(trail_id),
+    FOREIGN KEY (created_person) REFERENCES `user`(user_id)
+);
